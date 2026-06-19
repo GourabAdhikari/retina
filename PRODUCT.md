@@ -21,6 +21,9 @@ Do not make this feel like a salesy SaaS landing page, a busy dashboard, or a pl
 ## Antipatterns
 - Repeated card grids as the default page grammar. Cards are generic, flatten hierarchy, and make the explainer feel like a dashboard.
 - Metric-card walls, feature-card rows, or any layout where each idea is trapped in the same boxed module.
+- A large rounded bordered shell that wraps an entire section still counts as a card. Simulator shells, compare shells, glossary shells, and similar section-wide wrappers are part of the same failure mode.
+- Diagram nodes rendered as uniform rounded UI cards by default. In this project, flow diagrams should read like structure and sequence first, not like a dashboard of widgets.
+- If a section can be summarized as “three cards,” “two compare cards,” or “a big card containing smaller cards,” stop and rewrite it with rhythm, rules, columns, and spacing instead.
 - Nested containers whose only job is decoration rather than structure.
 - Any visual treatment that makes roadmap items feel as concrete or proven as implemented evidence.
 

@@ -1,0 +1,25 @@
+fold,feature,mutual_information,low_information_flag
+1,Obstructive sleep apnea syndrom,0.5946299664364241,False
+1,Age,0.4667007387483544,False
+1,Body mass index,0.46000864941128317,False
+1,Dyslipidemia,0.40566349020488524,False
+1,Smoking,0.14769696211846917,False
+1,Vascular disease,0.12096221456243095,False
+1,CHA2DS2-VASc,0.11228745006573027,False
+1,Diabetes mellitus,0.09146093956766777,False
+1,Body mass index__observed_mask,0.08639851020577183,False
+1,Stroke,0.08196457706314852,False
+1,Hypertension,0.06416198388795769,False
+1,Smoking__observed_mask,0.05499496072592658,False
+1,Congestive heart failure,0.03770788352493293,False
+1,Sex,0.013523138205949081,False
+1,Dyslipidemia__observed_mask,0.01221314251883765,False
+1,Diabetes mellitus__observed_mask,0.004366625435500371,True
+1,Hypertension__observed_mask,0.0,True
+1,Congestive heart failure__observed_mask,0.0,True
+1,Sex__observed_mask,0.0,True
+1,Age__observed_mask,0.0,True
+1,Vascular disease__observed_mask,0.0,True
+1,Stroke__observed_mask,0.0,True
+1,Obstructive sleep apnea syndrom__observed_mask,0.0,True
+1,CHA2DS2-VASc__observed_mask,0.0,True

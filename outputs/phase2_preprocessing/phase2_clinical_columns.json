@@ -1,0 +1,16 @@
+{
+  "clinical_cols": [
+    "Age",
+    "Sex",
+    "Congestive heart failure",
+    "Hypertension",
+    "Diabetes mellitus",
+    "Stroke",
+    "Vascular disease",
+    "Body mass index",
+    "CHA2DS2-VASc",
+    "Obstructive sleep apnea syndrom",
+    "Smoking",
+    "Dyslipidemia"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "category_maps": {
+    "Congestive heart failure": {
+      "0": 0,
+      "1": 1
+    },
+    "Diabetes mellitus": {
+      "0": 0,
+      "1": 1
+    },
+    "Dyslipidemia": {
+      "0.0": 0,
+      "1.0": 1
+    },
+    "Hypertension": {
+      "0": 0,
+      "1": 1
+    },
+    "Sex": {
+      "0": 0,
+      "1": 1
+    },
+    "Stroke": {
+      "0": 0,
+      "1": 1
+    },
+    "Vascular disease": {
+      "0": 0,
+      "1": 1
+    }
+  },
+  "clinical_cols": [
+    "Age",
+    "Sex",
+    "Congestive heart failure",
+    "Hypertension",
+    "Diabetes mellitus",
+    "Stroke",
+    "Vascular disease",
+    "Body mass index",
+    "CHA2DS2-VASc",
+    "Obstructive sleep apnea syndrom",
+    "Smoking",
+    "Dyslipidemia"
+  ],
+  "continuous_stats": {
+    "Age": {
+      "mean": 53.63847061769019,
+      "std": 17.541960333227077
+    },
+    "Body mass index": {
+      "mean": 27.43449081778982,
+      "std": 6.48541194645516
+    },
+    "CHA2DS2-VASc": {
+      "mean": 1.681462140992167,
+      "std": 1.3645439192545357
+    },
+    "Obstructive sleep apnea syndrom": {
+      "mean": 0.4464751958224543,
+      "std": 0.6943500849769288
+    }
+  },
+  "ordinal_cardinalities": {
+    "Smoking": 3
+  },
+  "specs": {
+    "Age": "continuous",
+    "Body mass index": "continuous",
+    "CHA2DS2-VASc": "continuous",
+    "Congestive heart failure": "binary",
+    "Diabetes mellitus": "binary",
+    "Dyslipidemia": "binary",
+    "Hypertension": "binary",
+    "Obstructive sleep apnea syndrom": "continuous",
+    "Sex": "binary",
+    "Smoking": "ordinal",
+    "Stroke": "binary",
+    "Vascular disease": "binary"
+  }
+}

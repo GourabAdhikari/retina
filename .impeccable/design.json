@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-19T15:06:06Z",
+  "title": "Design System: Retina Project Explainer",
+  "extensions": {
+    "colorMeta": {
+      "halo-blue": {
+        "role": "primary",
+        "displayName": "Cold Halo Blue",
+        "canonical": "#7FB2FF",
+        "tonalRamp": ["#0B1A31", "#102649", "#173563", "#224D8D", "#3E6FBF", "#5F92E3", "#7FB2FF", "#DDEBFF"]
+      },
+      "bg-void": {
+        "role": "neutral",
+        "displayName": "Void Black",
+        "canonical": "#030303",
+        "tonalRamp": ["#030303", "#070707", "#0B0B0B", "#101010", "#191919", "#252525", "#3A3A3A", "#5A5A5A"]
+      },
+      "bg-deep": {
+        "role": "neutral",
+        "displayName": "Deep Black",
+        "canonical": "#0A0A0A",
+        "tonalRamp": ["#0A0A0A", "#101010", "#151515", "#1C1C1C", "#292929", "#3A3A3A", "#525252", "#747474"]
+      },
+      "surface-low": {
+        "role": "neutral",
+        "displayName": "Low Surface Graphite",
+        "canonical": "#111111",
+        "tonalRamp": ["#111111", "#171717", "#1F1F1F", "#2A2A2A", "#373737", "#4B4B4B", "#666666", "#878787"]
+      },
+      "surface-high": {
+        "role": "neutral",
+        "displayName": "High Surface Graphite",
+        "canonical": "#171717",
+        "tonalRamp": ["#171717", "#1E1E1E", "#262626", "#303030", "#3F3F3F", "#565656", "#727272", "#949494"]
+      },
+      "line-smoke": {
+        "role": "neutral",
+        "displayName": "Smoke Line",
+        "canonical": "#2A2A2A",
+        "tonalRamp": ["#141414", "#1C1C1C", "#252525", "#2A2A2A", "#3A3A3A", "#555555", "#777777", "#A1A1A1"]
+      },
+      "text-high": {
+        "role": "neutral",
+        "displayName": "High Ink",
+        "canonical": "#F5F7FA",
+        "tonalRamp": ["#3B4048", "#525A64", "#6F7884", "#8A94A0", "#A9B2BC", "#C4CCD4", "#DEE4EA", "#F5F7FA"]
+      },
+      "text-mid": {
+        "role": "neutral",
+        "displayName": "Mid Ink",
+        "canonical": "#8C919A",
+        "tonalRamp": ["#1B1D21", "#2A2D32", "#3C4047", "#555A63", "#6C727B", "#8C919A", "#AEB2B9", "#D6D8DC"]
+      },
+      "text-low": {
+        "role": "neutral",
+        "displayName": "Low Ink",
+        "canonical": "#666A73",
+        "tonalRamp": ["#121317", "#1D2025", "#2A2D34", "#383C45", "#4C515B", "#666A73", "#8A8E96", "#C1C4C9"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero statements and one-line claims only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads, diagram titles, and major status labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Main narrative copy with long-form readability."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata, pills, and compact interface labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-low",
+        "value": "0 8px 24px rgba(0, 0, 0, 0.22)",
+        "purpose": "Hover lift for pills, chips, and compact controls."
+      },
+      {
+        "name": "ambient-mid",
+        "value": "0 18px 48px rgba(0, 0, 0, 0.34)",
+        "purpose": "Large prompt shells and hero modules."
+      },
+      {
+        "name": "halo-edge",
+        "value": "0 0 0 1px rgba(255,255,255,0.08)",
+        "purpose": "Quiet structural edge for dark surfaces."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "Default easing for hover and focus transitions."
+      },
+      {
+        "name": "duration-fast",
+        "value": "180ms",
+        "purpose": "Small control feedback."
+      },
+      {
+        "name": "duration-medium",
+        "value": "280ms",
+        "purpose": "Panel and prompt-shell transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "980px"
+      },
+      {
+        "name": "lg",
+        "value": "1240px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Primary quiet action for nav and section CTAs.",
+      "html": "<button class=\"ds-btn-outline\">Explore findings</button>",
+      "css": ".ds-btn-outline { background: #111111; color: #F5F7FA; border: 1px solid #2A2A2A; border-radius: 999px; padding: 12px 20px; font: 500 14px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; letter-spacing: 0.01em; transition: border-color 180ms cubic-bezier(0.19,1,0.22,1), box-shadow 180ms cubic-bezier(0.19,1,0.22,1), transform 180ms cubic-bezier(0.19,1,0.22,1); } .ds-btn-outline:hover { border-color: rgba(255,255,255,0.18); box-shadow: 0 8px 24px rgba(0,0,0,0.22); transform: translateY(-1px); } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 4px rgba(127,178,255,0.22); }"
+    },
+    {
+      "name": "Quiet Chip",
+      "kind": "chip",
+      "refersTo": "chip-outline",
+      "description": "Compact label for status and metadata.",
+      "html": "<span class=\"ds-chip\">Phase 2 complete</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; background: #171717; color: #F5F7FA; border: 1px solid #2A2A2A; border-radius: 999px; padding: 8px 14px; font: 500 13px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; letter-spacing: 0.01em; }"
+    },
+    {
+      "name": "Floating Panel",
+      "kind": "card",
+      "refersTo": "panel-floating",
+      "description": "Default container for diagrams, summaries, and grouped evidence.",
+      "html": "<section class=\"ds-panel\"><h3>Dataset snapshot</h3><p>Use this panel for evidence, never for decoration.</p></section>",
+      "css": ".ds-panel { background: #111111; color: #F5F7FA; border-radius: 18px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 18px 48px rgba(0,0,0,0.34); max-width: 420px; } .ds-panel h3 { margin: 0 0 12px; font: 500 20px/1.1 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; letter-spacing: -0.02em; } .ds-panel p { margin: 0; color: #8C919A; font: 400 16px/1.72 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }"
+    },
+    {
+      "name": "Prompt Shell",
+      "kind": "custom",
+      "refersTo": "prompt-shell",
+      "description": "Signature hero interaction, long and tactile but still quiet.",
+      "html": "<div class=\"ds-prompt\"><span class=\"ds-prompt-copy\">Ask what the project already proves.</span><button class=\"ds-prompt-send\" aria-label=\"Send\">↑</button></div>",
+      "css": ".ds-prompt { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 320px; max-width: 560px; background: #171717; color: #8C919A; border: 1px solid #2A2A2A; border-radius: 999px; padding: 20px 24px; box-shadow: 0 18px 48px rgba(0,0,0,0.34); } .ds-prompt-copy { font: 400 16px/1.4 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; } .ds-prompt-send { width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; background: rgba(255,255,255,0.04); color: #F5F7FA; font: 500 20px/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: border-color 180ms cubic-bezier(0.19,1,0.22,1), box-shadow 180ms cubic-bezier(0.19,1,0.22,1), transform 180ms cubic-bezier(0.19,1,0.22,1); } .ds-prompt-send:hover { border-color: rgba(127,178,255,0.5); box-shadow: 0 0 0 4px rgba(127,178,255,0.18); transform: translateY(-1px); } .ds-prompt-send:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 4px rgba(127,178,255,0.22); }"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "button-outline",
+      "description": "Low-noise top navigation for dark brand surfaces.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\">Overview</a><a href=\"#\">Pipeline</a><a href=\"#\">Evidence</a><a href=\"#\">Roadmap</a></nav>",
+      "css": ".ds-nav { display: inline-flex; align-items: center; gap: 28px; padding: 10px 0; } .ds-nav a { color: #8C919A; text-decoration: none; font: 500 14px/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; letter-spacing: 0.01em; transition: color 180ms cubic-bezier(0.19,1,0.22,1); } .ds-nav a:hover, .ds-nav a:focus-visible { color: #F5F7FA; outline: none; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Orbital Clinical Briefing",
+    "overview": "This system should feel like a research briefing projected onto a black field: calm, exact, and slightly futuristic. The mood is not cinematic chaos. It is controlled atmosphere. The page should give clinicians and collaborators the sense that the work is advanced, but already under discipline.\n\nThe design language is sparse and premium. Large white type carries the narrative. Surfaces are few, dark, and quiet. Accent color appears as a faint halo, not a rainbow. Density stays low so the distinction between current evidence and future roadmap remains easy to parse.\n\nThis system explicitly rejects the anti-references in `PRODUCT.md`: salesy SaaS landing page, busy dashboard, playful consumer AI site, flashy gradients, infographic clutter, over-carded layouts, and loud promotional copy.",
+    "keyCharacteristics": [
+      "Black-led palette with one cold halo accent",
+      "Sans-serif typography with surgical spacing and tight hierarchy",
+      "Tonal depth before visible decoration",
+      "Sparse composition, long breathing room, few containers",
+      "Scientific trust over AI spectacle"
+    ],
+    "rules": [
+      {
+        "name": "The One Halo Rule",
+        "body": "`#7FB2FF` is never a second background. It is a signal accent on 10% or less of any screen. Its rarity is the point.",
+        "section": "colors"
+      },
+      {
+        "name": "The Silent Hero Rule",
+        "body": "Hero typography carries scale and spacing, not effects. No serif swaps, no gradient text, no over-tight tracking below `-0.04em`.",
+        "section": "typography"
+      },
+      {
+        "name": "The Atmosphere, Not Glass Rule",
+        "body": "Use tonal layering and ambient shadow. Decorative glassmorphism is forbidden.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the page field in the `#030303` to `#111111` range and let whitespace do the work.",
+      "Do use `#F5F7FA` for primary copy and keep secondary copy at `#8C919A` or brighter on black.",
+      "Do reserve `#7FB2FF` for one focal interaction, one selected state, or one ambient halo per viewport.",
+      "Do keep long-form explanatory copy within 65–72ch and sentence case.",
+      "Do separate implemented evidence from roadmap with hierarchy, pacing, and grouping before adding any extra color."
+    ],
+    "donts": [
+      "Don't make this feel like a salesy SaaS landing page.",
+      "Don't make this feel like a busy dashboard.",
+      "Don't make this feel like a playful consumer AI site.",
+      "Don't use flashy gradients, infographic clutter, over-carded layouts, or loud promotional copy.",
+      "Don't use serif hero type, repeating grid overlays, rainbow cohort color systems, or metric-card walls as the page's main grammar.",
+      "Don't pair a visible border with a giant decorative shadow or blur-heavy glass treatment."
+    ]
+  }
+}

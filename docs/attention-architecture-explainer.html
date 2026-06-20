@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attention and Retina CAD Architecture</title>
+  <style>
+    :root {
+      --bg: #030303;
+      --bg-deep: #080808;
+      --surface: #101010;
+      --surface-2: #171717;
+      --line: #2a2a2a;
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --text: #f5f7fa;
+      --mid: #a2a9b4;
+      --low: #737b88;
+      --halo: #7fb2ff;
+      --halo-soft: rgba(127, 178, 255, 0.16);
+      --green: #7dd9a7;
+      --amber: #ffcc7f;
+      --violet: #bda3ff;
+      --max: 1240px;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.72;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 82% 4%, rgba(127,178,255,0.10), transparent 30rem),
+        radial-gradient(circle at 4% 34%, rgba(189,163,255,0.07), transparent 28rem),
+        linear-gradient(180deg, #070707 0%, #030303 30%, #090909 100%);
+      z-index: -2;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(3, 3, 3, 0.74);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .site-header .shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 15px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #eef6ff 0 8%, var(--halo) 9% 31%, rgba(127,178,255,0.2) 32% 54%, transparent 55%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 0 34px rgba(127,178,255,0.18);
+      flex: 0 0 auto;
+    }
+
+    .brand strong,
+    .brand span { display: block; white-space: nowrap; }
+    .brand strong { font-size: 0.95rem; font-weight: 620; }
+    .brand span { color: var(--mid); font-size: 0.84rem; }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      color: var(--mid);
+      text-decoration: none;
+      font-size: 0.92rem;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 5px;
+      transition: color 160ms ease, border-color 160ms ease;
+    }
+
+    .nav a:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+    main { padding-bottom: 90px; }
+
+    .hero { padding: clamp(64px, 9vw, 116px) 0 52px; }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+      gap: clamp(34px, 6vw, 84px);
+      align-items: end;
+    }
+
+    .signal {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--mid);
+      font-size: 0.92rem;
+      margin-bottom: 24px;
+    }
+
+    .signal::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--halo);
+      box-shadow: 0 0 18px rgba(127,178,255,0.42);
+    }
+
+    h1, h2, h3 { text-wrap: balance; }
+
+    h1 {
+      margin: 0;
+      max-width: 10.5ch;
+      font-size: clamp(3.2rem, 7vw, 5.8rem);
+      line-height: 0.96;
+      letter-spacing: -0.035em;
+      font-weight: 540;
+    }
+
+    .lead {
+      margin: 26px 0 0;
+      max-width: 70ch;
+      color: var(--mid);
+      font-size: clamp(1.02rem, 1.6vw, 1.16rem);
+      text-wrap: pretty;
+    }
+
+    .quiet-panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.022));
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .hero-note {
+      display: grid;
+      gap: 20px;
+      border-color: rgba(127,178,255,0.18);
+      box-shadow: 0 0 0 1px rgba(127,178,255,0.04) inset;
+    }
+
+    .hero-note h2 {
+      margin: 0;
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      font-weight: 540;
+    }
+
+    .hero-note p { margin: 0; color: var(--mid); }
+
+    .formula {
+      overflow-x: auto;
+      padding: 14px 0 0;
+      border-top: 1px solid var(--line-soft);
+      color: var(--text);
+      font-size: clamp(1rem, 1.4vw, 1.12rem);
+      white-space: nowrap;
+    }
+
+    .section {
+      padding: clamp(58px, 8vw, 104px) 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.75fr) minmax(280px, 1fr);
+      gap: clamp(26px, 5vw, 72px);
+      align-items: start;
+      margin-bottom: 36px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.7rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-weight: 530;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--mid);
+      max-width: 72ch;
+      text-wrap: pretty;
+    }
+
+    .definition-stack {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .definition {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.34fr) minmax(0, 1fr);
+      gap: clamp(18px, 4vw, 54px);
+      padding: 26px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .definition h3 {
+      margin: 0;
+      font-size: 1.12rem;
+      font-weight: 620;
+      line-height: 1.2;
+    }
+
+    .definition p { margin: 0; color: var(--mid); max-width: 78ch; }
+    .definition p + p { margin-top: 12px; }
+
+    code, .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+      color: #dbe9ff;
+    }
+
+    .canvas-stage {
+      background: #060606;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-top: 34px;
+      padding: 26px 0 32px;
+    }
+
+    .canvas-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+      color: var(--mid);
+      font-size: 0.92rem;
+    }
+
+    .canvas-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      background: radial-gradient(circle at 50% 50%, rgba(127,178,255,0.06), transparent 44%), #090909;
+    }
+
+    canvas {
+      display: block;
+      width: 1500px;
+      height: 940px;
+      max-width: none;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px 22px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .swatch { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+    .blue { color: var(--halo); }
+    .green { color: var(--green); }
+    .amber { color: var(--amber); }
+    .violet { color: var(--violet); }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+      gap: clamp(28px, 5vw, 74px);
+      align-items: start;
+    }
+
+    .layer-map {
+      display: grid;
+      gap: 14px;
+    }
+
+    .layer-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .layer-row:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+    .layer-row strong { font-weight: 620; }
+    .layer-row span { color: var(--mid); }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px 44px;
+      border-top: 1px solid var(--line);
+      padding-top: 26px;
+    }
+
+    .answer {
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .answer h3 {
+      margin: 0 0 9px;
+      font-size: 1.02rem;
+      line-height: 1.25;
+      font-weight: 650;
+    }
+
+    .answer p { margin: 0; color: var(--mid); text-wrap: pretty; }
+
+    .callout {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+      gap: clamp(18px, 4vw, 54px);
+      padding: 24px 0 0;
+      border-top: 1px solid rgba(127,178,255,0.22);
+    }
+
+    .callout strong { color: var(--halo); font-weight: 650; }
+    .callout p { margin: 0; color: var(--mid); max-width: 82ch; }
+
+    .compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--mid);
+    }
+
+    .compact-table th,
+    .compact-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .compact-table th {
+      color: var(--text);
+      font-weight: 620;
+    }
+
+    .compact-table td:first-child { color: var(--text); }
+
+    .footer-note {
+      margin-top: 46px;
+      color: var(--low);
+      max-width: 80ch;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .site-header .shell, .hero-layout, .section-head, .split, .definition, .callout {
+        grid-template-columns: 1fr;
+      }
+
+      .site-header .shell { align-items: flex-start; }
+      .nav { justify-content: flex-start; }
+      .answer-grid { grid-template-columns: 1fr; }
+      canvas { width: 1220px; height: 820px; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(calc(100% - 28px), var(--max)); }
+      .site-header { position: static; }
+      .brand span { white-space: normal; }
+      h1 { font-size: clamp(2.7rem, 14vw, 4rem); }
+      .quiet-panel { padding: 18px; }
+      .layer-row { grid-template-columns: 1fr; gap: 6px; }
+      .compact-table { font-size: 0.92rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell">
+      <div class="brand" aria-label="Retina CAD explainer">
+        <div class="mark" aria-hidden="true"></div>
+        <div>
+          <strong>Retina CAD architecture</strong>
+          <span>attention, ConvNeXt, SimCLR, clinical fusion</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Page sections">
+        <a href="#attention">Attention</a>
+        <a href="#diagram">Diagram</a>
+        <a href="#layers">Layers</a>
+        <a href="#terms">Terms</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-layout">
+        <div>
+          <div class="signal">Plain-language model briefing</div>
+          <h1>How the model learns what to look at.</h1>
+          <p class="lead">This page explains attention, self-attention, cross-attention, ConvNeXt-Tiny, ImageNet pretraining, OCTA-SimCLR adaptation, <span class="mono">F_octa</span>, and z-scores in the exact context of the planned Retina CAD model.</p>
+        </div>
+        <aside class="quiet-panel hero-note" aria-label="Core idea">
+          <h2>Attention is weighted relevance.</h2>
+          <p>The model creates a score for each source of information, turns scores into weights, then uses those weights to make a mixture of the most relevant information for the current patient.</p>
+          <div class="formula" aria-label="Attention formula">Attention(Q, K, V) = softmax(QKᵀ / √d) · V</div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="attention" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Attention, from first principle.</h2>
+          <p>Attention is not a separate kind of knowledge. It is a routing mechanism. It lets one representation ask which other representations matter right now, then pull information from them in proportion to that relevance.</p>
+        </div>
+
+        <div class="definition-stack">
+          <article class="definition">
+            <h3>Attention itself</h3>
+            <div>
+              <p>Think of a query asking a question. Keys describe what each available item contains. Values are the actual information to retrieve. The query is compared with every key. Better matches get larger weights. The output is a weighted sum of the values.</p>
+              <p>In this model, attention helps avoid a fixed rule like “always trust the superficial layer most.” Instead, the model can learn that the deep capillary layer, choriocapillaris, or clinical context matters more for a specific patient pattern.</p>
+            </div>
+          </article>
+
+          <article class="definition">
+            <h3>Self-attention</h3>
+            <div>
+              <p>Self-attention means the query, keys, and values all come from the same set of tokens. Here, the set is the three OCTA layer tokens: superficial, deep, and choriocapillaris.</p>
+              <p>It asks: “within the OCTA layers, how should each layer read the other layers?” For example, a superficial vascular feature can be interpreted differently if the deep layer also shows rarefaction.</p>
+            </div>
+          </article>
+
+          <article class="definition">
+            <h3>Cross-attention</h3>
+            <div>
+              <p>Cross-attention means the query comes from one source, while keys and values come from another. In the planned fusion block, <span class="mono">F_octa</span> asks a question, and <span class="mono">F_clinical</span> supplies clinical context as keys and values.</p>
+              <p>It asks: “given this OCTA pattern, which clinical facts should change the interpretation?” The same retinal finding may matter differently in a diabetic, hypertensive, or normotensive patient.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="diagram" class="section canvas-stage">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Architecture map.</h2>
+          <p>The canvas has extra horizontal and vertical space so the sequence stays legible: three OCTA images become three feature tokens, self-attention merges retinal layers, cross-attention adds clinical context, then a classifier predicts CAD-related class probabilities.</p>
+        </div>
+        <div class="canvas-toolbar">
+          <div class="legend" aria-label="Diagram legend">
+            <span class="blue"><i class="swatch"></i>OCTA path</span>
+            <span class="green"><i class="swatch"></i>clinical path</span>
+            <span class="violet"><i class="swatch"></i>attention</span>
+            <span class="amber"><i class="swatch"></i>classification</span>
+          </div>
+          <span>Scroll sideways if needed.</span>
+        </div>
+        <div class="canvas-wrap" role="img" aria-label="Canvas diagram of the Retina CAD model architecture">
+          <canvas id="architectureCanvas" width="1500" height="940"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="layers" class="section">
+      <div class="shell split">
+        <div>
+          <h2>How many layers are there?</h2>
+          <p class="lead">“Layer” means different things depending on context. The model has anatomical OCTA layers, neural network layers, attention blocks, and training stages. Mixing those meanings is the usual source of confusion.</p>
+        </div>
+        <div class="layer-map">
+          <div class="layer-row">
+            <strong>3 OCTA layers</strong>
+            <span>Superficial, deep, choriocapillaris. These are retinal depth slabs, not neural network layers.</span>
+          </div>
+          <div class="layer-row">
+            <strong>3 backbones</strong>
+            <span>One ConvNeXt-Tiny encoder per OCTA layer. They do not share weights, because each vascular layer has different texture.</span>
+          </div>
+          <div class="layer-row">
+            <strong>4 ConvNeXt stages</strong>
+            <span>ConvNeXt-Tiny internally uses four feature stages with depths 3, 3, 9, 3 and output channels 96, 192, 384, 768.</span>
+          </div>
+          <div class="layer-row">
+            <strong>1 self-attention block</strong>
+            <span>Eight heads read interactions among the three OCTA tokens, then mean-pooling creates <span class="mono">F_octa</span>.</span>
+          </div>
+          <div class="layer-row">
+            <strong>1 cross-attention block</strong>
+            <span>Four heads let the OCTA representation query clinical metadata.</span>
+          </div>
+          <div class="layer-row">
+            <strong>Several MLP layers</strong>
+            <span>Projection heads reduce 768 to 256, clinical metadata becomes 256, and the classifier maps the final 512 representation to disease classes.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="terms" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Term sheet.</h2>
+          <p>Short answers for the architecture vocabulary used in the plan. These are written for reading the notebook and model code later.</p>
+        </div>
+
+        <div class="answer-grid">
+          <article class="answer">
+            <h3>What is ConvNeXt-Tiny?</h3>
+            <p>A modern convolutional neural network. “Tiny” is the smallest common ConvNeXt size, not tiny in capability. It turns an image into increasingly abstract feature maps, ending with a 768-dimensional visual representation.</p>
+          </article>
+          <article class="answer">
+            <h3>Why is it the backbone?</h3>
+            <p>The backbone is the main feature extractor. It does the heavy image understanding before smaller heads perform projection, attention, fusion, and classification.</p>
+          </article>
+          <article class="answer">
+            <h3>What does pretrained on ImageNet mean?</h3>
+            <p>The ConvNeXt weights start from training on ImageNet, a large natural-image dataset. That gives useful low-level filters and general visual structure before the model sees OCTA.</p>
+          </article>
+          <article class="answer">
+            <h3>What is OCTA-SimCLR?</h3>
+            <p>SimCLR is self-supervised contrastive learning. OCTA-SimCLR means using OCTA images to teach the backbone which retinal images should be close in representation space without needing CAD labels.</p>
+          </article>
+          <article class="answer">
+            <h3>What does adapt mean here?</h3>
+            <p>Adapt means taking ImageNet-initialized ConvNeXt and continuing self-supervised training on OCTA. The features shift from natural photographs toward grayscale vessel and perfusion patterns.</p>
+          </article>
+          <article class="answer">
+            <h3>What is <span class="mono">F_octa</span>?</h3>
+            <p><span class="mono">F_octa</span> is the 256-dimensional summary after the model attends across superficial, deep, and choriocapillaris tokens. It is the layer-aware OCTA representation.</p>
+          </article>
+          <article class="answer">
+            <h3>What are z-scores?</h3>
+            <p>A z-score says how far a value is from the training-set mean in units of standard deviation: <span class="mono">z = (x − mean) / std</span>. It makes age, BMI, and image intensities comparable in scale.</p>
+          </article>
+          <article class="answer">
+            <h3>Why use z-scores in this model?</h3>
+            <p>Neural networks train more stably when inputs have similar scale. The plan computes mean and standard deviation on the training fold only, then applies those statistics to validation and test data to avoid leakage.</p>
+          </article>
+        </div>
+
+        <div class="callout">
+          <strong>The full path</strong>
+          <p>Sup, Deep, and CC images each pass through their own ConvNeXt-Tiny backbone. Their 768-dimensional outputs are projected to 256-dimensional tokens. Layer-identity embeddings mark which token is which. Self-attention creates <span class="mono">F_octa</span>. Clinical metadata becomes <span class="mono">F_clinical</span>. Cross-attention fuses OCTA with clinical context. The final 512-dimensional representation goes to the classifier.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Shape summary.</h2>
+          <p>The dimensions are not arbitrary. They control capacity, compute, and overfitting risk for a medium-sized medical dataset.</p>
+        </div>
+        <table class="compact-table" aria-label="Model tensor shapes">
+          <thead>
+            <tr>
+              <th>Object</th>
+              <th>Shape or size</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Input OCTA image</td>
+              <td>224 × 224</td>
+              <td>Resized layer image after preprocessing.</td>
+            </tr>
+            <tr>
+              <td>ConvNeXt final map</td>
+              <td>7 × 7 × 768</td>
+              <td>Spatial features retained for Grad-CAM, then pooled.</td>
+            </tr>
+            <tr>
+              <td>Layer token</td>
+              <td>256</td>
+              <td>Projected feature for Sup, Deep, or CC.</td>
+            </tr>
+            <tr>
+              <td>Self-attention sequence</td>
+              <td>3 × 256</td>
+              <td>Three layer tokens read each other.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">F_octa</span></td>
+              <td>256</td>
+              <td>Mean-pooled layer-aware OCTA representation.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">F_clinical</span></td>
+              <td>256</td>
+              <td>Clinical metadata representation.</td>
+            </tr>
+            <tr>
+              <td>Unified representation</td>
+              <td>512</td>
+              <td>Final multimodal vector before classification.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="footer-note">Note: the optional mask branch can add vessel, FAZ, and flow-deficit mask features when segmentation masks are available. It is not required to understand the core attention path.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('architectureCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const C = {
+      bg: '#090909',
+      line: 'rgba(255,255,255,0.18)',
+      lineSoft: 'rgba(255,255,255,0.08)',
+      text: '#f5f7fa',
+      mid: '#a2a9b4',
+      low: '#737b88',
+      blue: '#7fb2ff',
+      green: '#7dd9a7',
+      amber: '#ffcc7f',
+      violet: '#bda3ff',
+      surface: '#111111',
+      surface2: '#171717'
+    };
+
+    function roundRect(x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + w, y, x + w, y + h, radius);
+      ctx.arcTo(x + w, y + h, x, y + h, radius);
+      ctx.arcTo(x, y + h, x, y, radius);
+      ctx.arcTo(x, y, x + w, y, radius);
+      ctx.closePath();
+    }
+
+    function label(text, x, y, size = 22, color = C.text, weight = 560, align = 'left') {
+      ctx.font = `${weight} ${size}px ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'top';
+      ctx.fillText(text, x, y);
+    }
+
+    function wrap(text, x, y, maxWidth, lineHeight, size = 17, color = C.mid, weight = 400) {
+      ctx.font = `${weight} ${size}px ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial`;
+      ctx.fillStyle = color;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      const words = text.split(' ');
+      let line = '';
+      let yy = y;
+      words.forEach((word, index) => {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, yy);
+          line = word;
+          yy += lineHeight;
+        } else {
+          line = test;
+        }
+        if (index === words.length - 1 && line) ctx.fillText(line, x, yy);
+      });
+    }
+
+    function box({x, y, w, h, title, sub, color = C.blue, fill = C.surface}) {
+      roundRect(x, y, w, h, 14);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.strokeStyle = color + '66';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x + 18, y + 20, 4, 0, Math.PI * 2);
+      ctx.fill();
+      label(title, x + 32, y + 12, 18, C.text, 620);
+      if (sub) wrap(sub, x + 18, y + 44, w - 36, 20, 14.5, C.mid);
+    }
+
+    function arrow(x1, y1, x2, y2, color = C.line) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const len = 10;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - len * Math.cos(angle - Math.PI / 6), y2 - len * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x2 - len * Math.cos(angle + Math.PI / 6), y2 - len * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function bracket(x, y1, y2, text, color) {
+      ctx.strokeStyle = color + '88';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y1);
+      ctx.lineTo(x - 16, y1);
+      ctx.lineTo(x - 16, y2);
+      ctx.lineTo(x, y2);
+      ctx.stroke();
+      label(text, x - 10, y2 + 12, 15, color, 600, 'right');
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = C.lineSoft;
+      ctx.lineWidth = 1;
+      for (let x = 80; x < canvas.width; x += 80) {
+        ctx.beginPath(); ctx.moveTo(x, 72); ctx.lineTo(x, 880); ctx.stroke();
+      }
+      for (let y = 120; y < canvas.height; y += 80) {
+        ctx.beginPath(); ctx.moveTo(54, y); ctx.lineTo(1440, y); ctx.stroke();
+      }
+
+      label('Retina CAD model, planned V1 architecture', 54, 42, 30, C.text, 560);
+      wrap('Three OCTA depth slabs are encoded separately, aligned by layer identity, fused by self-attention, then interpreted through clinical cross-attention.', 54, 82, 900, 22, 16, C.mid);
+
+      const rows = [
+        {name: 'Sup OCTA', y: 172, sub: 'superficial vascular slab'},
+        {name: 'Deep OCTA', y: 320, sub: 'deep capillary slab'},
+        {name: 'CC OCTA', y: 468, sub: 'choriocapillaris slab'}
+      ];
+
+      rows.forEach((r) => {
+        box({x: 70, y: r.y, w: 150, h: 82, title: r.name, sub: r.sub, color: C.blue, fill: '#101318'});
+        box({x: 278, y: r.y - 8, w: 205, h: 98, title: 'ConvNeXt-Tiny', sub: 'ImageNet init, then OCTA-SimCLR adapted. Final stage gives 768 features.', color: C.blue});
+        box({x: 542, y: r.y, w: 176, h: 82, title: 'Projection', sub: '768 to 512 to 256 token', color: C.blue});
+        arrow(220, r.y + 41, 278, r.y + 41, C.blue + 'aa');
+        arrow(483, r.y + 41, 542, r.y + 41, C.blue + 'aa');
+      });
+
+      bracket(742, 172, 550, '3 independent OCTA encoders', C.blue);
+
+      box({x: 785, y: 184, w: 190, h: 76, title: 'T_sup', sub: 'Fs + layer identity', color: C.violet, fill: '#14111a'});
+      box({x: 785, y: 332, w: 190, h: 76, title: 'T_deep', sub: 'Fd + layer identity', color: C.violet, fill: '#14111a'});
+      box({x: 785, y: 480, w: 190, h: 76, title: 'T_cc', sub: 'Fc + layer identity', color: C.violet, fill: '#14111a'});
+
+      rows.forEach((r, i) => arrow(718, r.y + 41, 785, [222, 370, 518][i], C.violet + 'aa'));
+
+      box({x: 1040, y: 286, w: 238, h: 154, title: 'Self-attention', sub: '8 heads. Tokens from the same OCTA set read each other: Sup, Deep, CC.', color: C.violet, fill: '#151119'});
+      arrow(975, 222, 1040, 318, C.violet + 'aa');
+      arrow(975, 370, 1040, 363, C.violet + 'aa');
+      arrow(975, 518, 1040, 408, C.violet + 'aa');
+
+      box({x: 1332, y: 312, w: 126, h: 104, title: 'F_octa', sub: 'mean-pooled 256-d OCTA representation', color: C.violet, fill: '#151119'});
+      arrow(1278, 363, 1332, 363, C.violet + 'aa');
+
+      box({x: 70, y: 690, w: 198, h: 106, title: 'Clinical data', sub: 'age, BMI, sex, HTN, diabetes, lipids, smoking, missing tokens', color: C.green, fill: '#101713'});
+      box({x: 334, y: 690, w: 224, h: 106, title: 'Clinical MLP', sub: 'LayerNorm, FC to 128, GELU, FC to 256', color: C.green, fill: '#101713'});
+      box({x: 626, y: 704, w: 172, h: 78, title: 'F_clinical', sub: '256-d context', color: C.green, fill: '#101713'});
+      arrow(268, 743, 334, 743, C.green + 'aa');
+      arrow(558, 743, 626, 743, C.green + 'aa');
+
+      box({x: 910, y: 676, w: 250, h: 128, title: 'Cross-attention', sub: 'Q from F_octa. K and V from F_clinical. 4 heads.', color: C.violet, fill: '#151119'});
+      arrow(1396, 416, 1035, 676, C.violet + 'aa');
+      arrow(798, 743, 910, 743, C.green + 'aa');
+
+      box({x: 1224, y: 690, w: 190, h: 106, title: 'Fusion + head', sub: '512-d unified vector, classifier, prototype logits, uncertainty', color: C.amber, fill: '#17140d'});
+      arrow(1160, 743, 1224, 743, C.amber + 'bb');
+
+      label('What each attention block means', 70, 852, 22, C.text, 620);
+      wrap('Self-attention is OCTA to OCTA. Cross-attention is OCTA to clinical context. Both use the same attention math, but they pull from different sources.', 70, 884, 880, 24, 17, C.mid);
+
+      ctx.strokeStyle = C.lineSoft;
+      ctx.beginPath();
+      ctx.moveTo(38, 630);
+      ctx.lineTo(1462, 630);
+      ctx.stroke();
+      label('clinical branch', 72, 632, 15, C.green, 620);
+    }
+
+    draw();
+  </script>
+</body>
+</html>

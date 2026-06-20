@@ -7,4 +7,6 @@ The plan will be in [PLAN.md](PLAN.md). Track the progress in a [PROGRESS.md](PR
 
 Since the dataset is not on this machine, the directory structure will be in [TREE.md](TREE.md) generated from the unix tree command.
 
-The clinical data is in [Table for publication](table_for_publication .xlsx)
+The clinical data is in [Table for publication](table_for_publication.xlsx)
+
+For creating docs/explainers, put them in @docs directory and use [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md)

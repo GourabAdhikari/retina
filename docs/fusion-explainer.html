@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fusion in Retina CAD</title>
+  <style>
+    :root {
+      --bg: #030303;
+      --bg-deep: #0a0a0a;
+      --surface: #111111;
+      --surface-high: #171717;
+      --line: #2a2a2a;
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --text: #f5f7fa;
+      --text-mid: #9aa1ac;
+      --text-low: #6d7480;
+      --halo: #7fb2ff;
+      --halo-soft: rgba(127, 178, 255, 0.18);
+      --success: #7dd9a7;
+      --planned: #ffcc7f;
+      --danger: #ff8c8c;
+      --shadow-lg: 0 22px 60px rgba(0, 0, 0, 0.34);
+      --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1200px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #060606 0%, #030303 24%, #090909 100%);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.72;
+      letter-spacing: 0;
+    }
+
+    a { color: inherit; }
+    button { font: inherit; }
+
+    .shell {
+      width: min(calc(100% - 40px), var(--max));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      background: rgba(3, 3, 3, 0.68);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .site-header .shell {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+    }
+
+    .brandline {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brandmark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #dcebff 0%, #7fb2ff 28%, rgba(127,178,255,0.2) 55%, rgba(127,178,255,0.02) 72%, transparent 73%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 0 30px rgba(127,178,255,0.18);
+      flex: 0 0 auto;
+    }
+
+    .brandcopy {
+      min-width: 0;
+    }
+
+    .brandcopy strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .brandcopy span {
+      display: block;
+      color: var(--text-mid);
+      font-size: 0.86rem;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      color: var(--text-mid);
+      text-decoration: none;
+      padding: 4px 0 6px;
+      border-bottom: 1px solid transparent;
+      transition: border-color 180ms ease, color 180ms ease;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.16);
+    }
+
+    main {
+      padding-bottom: 90px;
+    }
+
+    .hero {
+      padding: 68px 0 44px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      gap: 42px;
+      align-items: start;
+    }
+
+    .kicker-row,
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 18px;
+      align-items: center;
+    }
+
+    .meta-row {
+      display: grid;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .kicker-row { margin-bottom: 18px; }
+
+    .marker-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      padding: 0;
+      border: 0;
+      background: none;
+      border-radius: 0;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(3rem, 6vw, 5.4rem);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      font-weight: 520;
+      text-wrap: balance;
+      max-width: 11ch;
+    }
+
+    .lead {
+      max-width: 68ch;
+      color: var(--text-mid);
+      font-size: 1.08rem;
+      margin: 22px 0 0;
+      text-wrap: pretty;
+    }
+
+    .summary-rail {
+      margin-top: 26px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .summary-rail div strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .summary-rail div p {
+      margin: 0;
+      color: var(--text-mid);
+      font-size: 0.95rem;
+    }
+
+    .hero-side {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius: 26px;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-side::before {
+      content: none;
+    }
+
+    .hero-side h2,
+    h2.section-title {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      font-weight: 520;
+      margin: 0 0 16px;
+      text-wrap: balance;
+    }
+
+    .hero-side p,
+    .section-copy,
+    .explanation-copy,
+    .flow-body,
+    .glossary dd,
+    .status-grid li,
+    .compare p,
+    .deep-grid p,
+    .callout p,
+    .footnote,
+    details p,
+    details li,
+    .note,
+    td,
+    th {
+      color: var(--text-mid);
+      font-size: 1rem;
+      margin-top: 0;
+      text-wrap: pretty;
+    }
+
+    .meta-row {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .meta-row .marker-line {
+      color: var(--text);
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .meta-row .marker-line:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .section {
+      padding: 62px 0 14px;
+    }
+
+    .section-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.72fr);
+      gap: 28px;
+      align-items: start;
+      padding-bottom: 26px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 28px;
+    }
+
+    .section-aside {
+      color: var(--text-low);
+      font-size: 0.96rem;
+      padding-left: 22px;
+      border-left: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mode,
+    .stage-tabs {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .mode {
+      margin-top: 18px;
+    }
+
+    .mode button,
+    .stage-tabs button {
+      padding: 0 0 8px;
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background: none;
+      color: var(--text-mid);
+      transition: border-color 180ms ease, color 180ms ease;
+    }
+
+    .mode button:hover,
+    .stage-tabs button:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .mode button[aria-pressed="true"],
+    .stage-tabs button[aria-pressed="true"] {
+      color: var(--text);
+      border-color: rgba(127,178,255,0.52);
+      background: none;
+      box-shadow: none;
+    }
+
+    [data-level] { display: none; }
+    body[data-view="basic"] [data-level~="basic"],
+    body[data-view="intermediate"] [data-level~="basic"],
+    body[data-view="intermediate"] [data-level~="intermediate"],
+    body[data-view="advanced"] [data-level~="basic"],
+    body[data-view="advanced"] [data-level~="intermediate"],
+    body[data-view="advanced"] [data-level~="advanced"] {
+      display: block;
+    }
+
+    body[data-view="basic"] tr[data-level~="basic"],
+    body[data-view="intermediate"] tr[data-level~="basic"],
+    body[data-view="intermediate"] tr[data-level~="intermediate"],
+    body[data-view="advanced"] tr[data-level~="basic"],
+    body[data-view="advanced"] tr[data-level~="intermediate"],
+    body[data-view="advanced"] tr[data-level~="advanced"] {
+      display: table-row;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    .compare > div {
+      padding-right: 18px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .compare > div:last-child { border-right: 0; padding-right: 0; }
+
+    .compare h3,
+    .deep-grid h3,
+    .flow-title,
+    .callout strong,
+    .glossary dt {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .diagram-shell {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.015));
+      border-radius: 28px;
+      padding: 22px 22px 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .stage-tabs {
+      margin-bottom: 16px;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.85fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .flow-panel {
+      min-height: 100%;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      padding-left: 22px;
+    }
+
+    .flow-body {
+      display: none;
+    }
+
+    .flow-body.is-active {
+      display: block;
+      animation: fadeIn 220ms ease;
+    }
+
+    .legend {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-mid);
+      font-size: 0.9rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rule-solid,
+    .rule-dashed,
+    .rule-blue {
+      width: 34px;
+      height: 0;
+      border-top: 2px solid currentColor;
+      color: var(--text-mid);
+    }
+
+    .rule-dashed { border-top-style: dashed; color: var(--planned); }
+    .rule-blue { color: var(--halo); }
+
+    .status-grid {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 24px;
+    }
+
+    .status-grid li {
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .status-grid strong,
+    .status-tag {
+      color: var(--text);
+      font-size: 0.93rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .status-tag::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .built { color: var(--success); }
+    .planned { color: var(--planned); }
+    .watch { color: var(--danger); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 14px 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .deep-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 30px;
+    }
+
+    .callout {
+      margin-top: 26px;
+      padding: 20px 0 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    details {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 16px;
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 600;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      float: right;
+      color: var(--halo);
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    details[open] summary::after { content: "−"; }
+
+    .glossary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 28px;
+    }
+
+    .glossary dl {
+      margin: 0;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .glossary dd {
+      margin: 0;
+    }
+
+    .footer {
+      padding: 60px 0 20px;
+      color: var(--text-low);
+      font-size: 0.9rem;
+    }
+
+    .monoish {
+      font-feature-settings: "tnum" 1;
+      letter-spacing: 0.01em;
+    }
+
+    .note {
+      margin-top: 10px;
+      color: var(--text-low);
+      font-size: 0.94rem;
+    }
+
+    .label {
+      color: var(--text-low);
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .section-top,
+      .stage-grid,
+      .summary-rail,
+      .compare,
+      .deep-grid,
+      .glossary {
+        grid-template-columns: 1fr;
+      }
+
+      .section-aside,
+      .flow-panel,
+      .compare > div {
+        border-left: 0;
+        border-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .status-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(calc(100% - 28px), var(--max)); }
+      .site-header .shell { align-items: flex-start; flex-direction: column; }
+      .nav { justify-content: flex-start; }
+      .hero { padding-top: 42px; }
+      .diagram-shell { padding: 16px 16px 12px; border-radius: 22px; }
+      .hero-side { padding: 18px; border-radius: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body data-view="basic">
+  <header class="site-header">
+    <div class="shell">
+      <div class="brandline">
+        <div class="brandmark" aria-hidden="true"></div>
+        <div class="brandcopy">
+          <strong>Retina CAD, fusion explainer</strong>
+          <span>How OCTA layers and clinical variables become one prediction pathway</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Section navigation">
+        <a href="#overview">Overview</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#status">Status</a>
+        <a href="#deep-dive">Deep dive</a>
+        <a href="#glossary">Glossary</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="kicker-row">
+            <span class="marker-line"><span class="dot" style="color: var(--halo)"></span>Intermediate fusion, not raw-data fusion</span>
+            <span class="marker-line"><span class="dot" style="color: var(--success)"></span>Repo built through phases 1 to 3</span>
+            <span class="marker-line"><span class="dot" style="color: var(--planned)"></span>Fusion branch is planned next</span>
+          </div>
+          <h1>Fusion means the model learns from retinal images and clinical context together.</h1>
+          <p class="lead">
+            In this project, fusion does <em>not</em> mean dumping a spreadsheet next to pixels and hoping for the best. The plan is to first learn a compact representation from each retinal layer, learn a compact representation from the clinical variables, then merge those learned features into one shared pathway that produces class probabilities, uncertainty, and explanations.
+          </p>
+          <div class="mode" aria-label="Reading depth">
+            <button type="button" data-view-target="basic" aria-pressed="true">View basics</button>
+            <button type="button" data-view-target="intermediate" aria-pressed="false">View more detail</button>
+            <button type="button" data-view-target="advanced" aria-pressed="false">View advanced notes</button>
+          </div>
+          <div class="summary-rail">
+            <div>
+              <strong>What goes in</strong>
+              <p>Three OCTA layers per eye, plus age, sex, BMI, smoking, hypertension, diabetes, dyslipidemia, and related clinical fields.</p>
+            </div>
+            <div>
+              <strong>Where fusion happens</strong>
+              <p>After the image and clinical branches each create learned feature vectors. This is feature-level fusion, also called intermediate fusion.</p>
+            </div>
+            <div>
+              <strong>Why it exists</strong>
+              <p>The same retinal pattern can mean different things depending on patient context. Clinical data helps the model interpret what the image pattern likely means.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-side" aria-labelledby="quick-answer">
+          <h2 id="quick-answer">Short answer</h2>
+          <p>
+            The planned model has two streams. One stream reads the three OCTA images. The other reads the clinical variables. Those streams meet in a fusion block, then continue as one prediction pathway.
+          </p>
+          <div class="meta-row">
+            <span class="marker-line"><span class="dot built"></span>Current notebook: dataset audit, preprocessing, SimCLR pretraining</span>
+            <span class="marker-line"><span class="dot planned"></span>Planned next: image encoders, clinical encoder, fusion, classifier</span>
+            <span class="marker-line"><span class="dot watch"></span>Important: this page separates implemented work from architecture intent</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Overview</span>
+            <h2 class="section-title">What “fusion” means in plain language</h2>
+            <p class="section-copy" data-level="basic">
+              Imagine a clinician looking at a scan and a chart at the same time. The scan shows what the eye looks like. The chart shows who the patient is and what risk factors they carry. Fusion is the model version of that joint reasoning.
+            </p>
+            <p class="section-copy" data-level="intermediate">
+              In machine learning terms, each input type is first encoded into a numerical summary called a <em>feature vector</em>. Those vectors are then combined into a shared representation that is easier for the classifier to use than raw inputs.
+            </p>
+            <p class="section-copy" data-level="advanced">
+              This project is aiming for <em>intermediate multimodal fusion</em>. Raw pixels stay in the image branch. Raw tabular values stay in the clinical branch. Fusion happens after modality-specific encoders have transformed them into 256-dimensional learned representations.
+            </p>
+          </div>
+          <aside class="section-aside">
+            The model is trying to classify disease cohorts from retinal OCTA. The hypothesis is that disease signal is spread across retinal depth and patient context, not confined to one image or one spreadsheet field.
+          </aside>
+        </div>
+
+        <div class="compare">
+          <div>
+            <h3>Image only</h3>
+            <p>Useful when the scan alone contains enough signal. Weak when the same visual pattern appears in different clinical settings.</p>
+          </div>
+          <div>
+            <h3>Clinical only</h3>
+            <p>Useful for broad risk estimation. Weak when retinal microvascular texture carries signal that the chart does not capture.</p>
+          </div>
+          <div>
+            <h3>Fused model</h3>
+            <p>Lets the model ask, “given this retinal pattern and this patient context, which disease cohort is most plausible?”</p>
+          </div>
+        </div>
+
+        <div class="callout" data-level="basic">
+          <strong>One sentence summary</strong>
+          <p>Fusion is the step where the model turns “what the eye looks like” and “what we know about the patient” into one joint decision.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pipeline">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Architecture view</span>
+            <h2 class="section-title">Where fusion sits in the planned pipeline</h2>
+            <p class="section-copy">
+              Click the steps below. The diagram highlights one part of the pathway at a time. Solid marks show work already built in the notebook. Dashed marks show the next planned stages from <span class="monoish">PLAN.md</span>.
+            </p>
+          </div>
+          <aside class="section-aside">
+            The current repository has implemented the data path up to preprocessing and layer-specific SimCLR pretraining. The actual fusion block is not coded yet. It is defined in the architecture plan.
+          </aside>
+        </div>
+
+        <div class="diagram-shell">
+          <div class="stage-tabs" role="tablist" aria-label="Pipeline stages">
+            <button type="button" role="tab" aria-pressed="true" data-stage="1">1. Inputs</button>
+            <button type="button" role="tab" aria-pressed="false" data-stage="2">2. Image branch</button>
+            <button type="button" role="tab" aria-pressed="false" data-stage="3">3. Clinical branch</button>
+            <button type="button" role="tab" aria-pressed="false" data-stage="4">4. Fusion</button>
+            <button type="button" role="tab" aria-pressed="false" data-stage="5">5. Output</button>
+          </div>
+
+          <div class="stage-grid">
+            <div>
+              <svg viewBox="0 0 1040 620" aria-labelledby="diagram-title diagram-desc" role="img">
+                <title id="diagram-title">Planned Retina CAD fusion pathway</title>
+                <desc id="diagram-desc">Three OCTA image layers flow through separate image encoders, a clinical table flows through a clinical encoder, both join at a fusion block, then continue to classifier and uncertainty outputs.</desc>
+                <defs>
+                  <linearGradient id="strokeBlue" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#7fb2ff" />
+                    <stop offset="100%" stop-color="#dcebff" />
+                  </linearGradient>
+                  <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="8" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <rect x="0" y="0" width="1040" height="620" rx="28" fill="rgba(255,255,255,0.01)" />
+
+                <g data-node="1" class="svg-stage is-active">
+                  <text x="60" y="54" fill="#f5f7fa" font-size="22" font-weight="600">Inputs</text>
+                  <text x="60" y="84" fill="#8c919a" font-size="15">Three retinal layers from OCTA, plus clinical variables from the table.</text>
+
+                  <rect x="60" y="120" width="180" height="84" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
+                  <path d="M84 170 C100 136, 118 186, 134 152 S166 190, 188 160 S218 176, 228 150" fill="none" stroke="#d7e6ff" stroke-width="2.8" opacity="0.88" />
+                  <text x="84" y="146" fill="#f5f7fa" font-size="17" font-weight="600">SVC image</text>
+                  <text x="84" y="190" fill="#8c919a" font-size="14">superficial layer</text>
+
+                  <rect x="60" y="230" width="180" height="84" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
+                  <path d="M84 280 C104 248, 124 298, 146 258 S186 294, 224 270" fill="none" stroke="#d7e6ff" stroke-width="2.8" opacity="0.74" />
+                  <text x="84" y="256" fill="#f5f7fa" font-size="17" font-weight="600">DVC image</text>
+                  <text x="84" y="300" fill="#8c919a" font-size="14">deep layer</text>
+
+                  <rect x="60" y="340" width="180" height="84" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
+                  <path d="M84 392 C96 354, 130 402, 154 366 S198 402, 224 378" fill="none" stroke="#d7e6ff" stroke-width="2.8" opacity="0.62" />
+                  <text x="84" y="366" fill="#f5f7fa" font-size="17" font-weight="600">CC image</text>
+                  <text x="84" y="410" fill="#8c919a" font-size="14">choriocapillaris</text>
+
+                  <rect x="60" y="478" width="240" height="82" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
+                  <text x="84" y="508" fill="#f5f7fa" font-size="17" font-weight="600">Clinical table</text>
+                  <text x="84" y="536" fill="#8c919a" font-size="14">Age, sex, BMI, smoking, hypertension, diabetes, dyslipidemia…</text>
+                </g>
+
+                <g data-node="2" class="svg-stage">
+                  <text x="332" y="54" fill="#f5f7fa" font-size="22" font-weight="600">Image branch</text>
+                  <text x="332" y="84" fill="#8c919a" font-size="15">Each layer gets its own encoder. Then the three layer tokens interact.</text>
+
+                  <path d="M240 162 H316" stroke="#7dd9a7" stroke-width="3" stroke-linecap="round" />
+                  <path d="M240 272 H316" stroke="#7dd9a7" stroke-width="3" stroke-linecap="round" />
+                  <path d="M240 382 H316" stroke="#7dd9a7" stroke-width="3" stroke-linecap="round" />
+                  <text x="250" y="146" fill="#7dd9a7" font-size="12">built through preprocessing and pretraining</text>
+
+                  <rect x="316" y="124" width="156" height="76" rx="38" fill="#0f1114" stroke="rgba(127,178,255,0.22)" stroke-dasharray="8 8" />
+                  <rect x="316" y="234" width="156" height="76" rx="38" fill="#0f1114" stroke="rgba(127,178,255,0.22)" stroke-dasharray="8 8" />
+                  <rect x="316" y="344" width="156" height="76" rx="38" fill="#0f1114" stroke="rgba(127,178,255,0.22)" stroke-dasharray="8 8" />
+                  <text x="366" y="168" fill="#f5f7fa" font-size="17" font-weight="600">Encoder</text>
+                  <text x="343" y="278" fill="#f5f7fa" font-size="17" font-weight="600">Encoder</text>
+                  <text x="343" y="388" fill="#f5f7fa" font-size="17" font-weight="600">Encoder</text>
+                  <text x="332" y="448" fill="#8c919a" font-size="14">planned phase 4</text>
+
+                  <path d="M472 162 H544" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <path d="M472 272 H544" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <path d="M472 382 H544" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+
+                  <circle cx="628" cy="272" r="94" fill="rgba(127,178,255,0.05)" stroke="url(#strokeBlue)" stroke-width="2.5" filter="url(#softGlow)" />
+                  <circle cx="628" cy="272" r="58" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" />
+                  <text x="576" y="254" fill="#f5f7fa" font-size="17" font-weight="600">Cross-layer</text>
+                  <text x="594" y="280" fill="#f5f7fa" font-size="17" font-weight="600">attention</text>
+                  <text x="560" y="306" fill="#8c919a" font-size="14">learns how SVC, DVC, CC relate</text>
+                </g>
+
+                <g data-node="3" class="svg-stage">
+                  <text x="332" y="506" fill="#f5f7fa" font-size="22" font-weight="600">Clinical branch</text>
+                  <text x="332" y="536" fill="#8c919a" font-size="15">A small MLP turns clinical variables into one 256-d clinical token.</text>
+                  <path d="M300 520 H316" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <rect x="316" y="478" width="202" height="82" rx="41" fill="#0f1114" stroke="rgba(127,178,255,0.22)" stroke-dasharray="8 8" />
+                  <text x="362" y="512" fill="#f5f7fa" font-size="17" font-weight="600">Clinical encoder</text>
+                  <text x="356" y="538" fill="#8c919a" font-size="14">handles missingness with masks/tokens</text>
+                </g>
+
+                <g data-node="4" class="svg-stage">
+                  <text x="744" y="54" fill="#f5f7fa" font-size="22" font-weight="600">Fusion block</text>
+                  <text x="744" y="84" fill="#8c919a" font-size="15">Image representation and clinical representation become one shared state.</text>
+
+                  <path d="M722 272 H780" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <path d="M518 518 C640 518, 640 390, 780 390" fill="none" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <path d="M780 390 V304" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+
+                  <rect x="780" y="206" width="170" height="126" rx="24" fill="rgba(127,178,255,0.08)" stroke="url(#strokeBlue)" stroke-width="2.5" filter="url(#softGlow)" />
+                  <text x="832" y="246" fill="#f5f7fa" font-size="18" font-weight="600">Fusion</text>
+                  <text x="811" y="276" fill="#f5f7fa" font-size="16">cross-attention</text>
+                  <text x="803" y="302" fill="#8c919a" font-size="14">OCTA attends to clinical context</text>
+                </g>
+
+                <g data-node="5" class="svg-stage">
+                  <path d="M950 270 H1000" stroke="#f5f7fa" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
+                  <rect x="1000" y="214" width="0" height="112" rx="20" fill="none" />
+                  <text x="962" y="170" fill="#f5f7fa" font-size="22" font-weight="600">Output</text>
+                  <text x="962" y="198" fill="#8c919a" font-size="15">Classifier, probabilities, uncertainty, explainability.</text>
+
+                  <g transform="translate(936 226)">
+                    <rect x="0" y="0" width="90" height="22" rx="11" fill="#111111" stroke="rgba(255,255,255,0.08)" />
+                    <text x="16" y="15" fill="#f5f7fa" font-size="13">class scores</text>
+                    <rect x="0" y="34" width="90" height="22" rx="11" fill="#111111" stroke="rgba(255,255,255,0.08)" />
+                    <text x="16" y="49" fill="#f5f7fa" font-size="13">uncertainty</text>
+                    <rect x="0" y="68" width="90" height="22" rx="11" fill="#111111" stroke="rgba(255,255,255,0.08)" />
+                    <text x="18" y="83" fill="#f5f7fa" font-size="13">heatmaps</text>
+                  </g>
+                </g>
+              </svg>
+
+              <div class="legend" aria-hidden="true">
+                <span><span class="rule-solid" style="color: var(--success)"></span>built now</span>
+                <span><span class="rule-dashed"></span>planned next</span>
+                <span><span class="rule-blue"></span>fusion path</span>
+              </div>
+            </div>
+
+            <aside class="flow-panel" aria-live="polite">
+              <div class="flow-body is-active" data-stage-copy="1">
+                <h3 class="flow-title">Step 1, inputs</h3>
+                <p>The model sees three OCTA views of the same eye: superficial vascular complex, deep vascular complex, and choriocapillaris. It also sees clinical variables from the spreadsheet.</p>
+                <p data-level="basic">These are different kinds of evidence. Images show structure. Clinical variables show patient context.</p>
+                <p data-level="advanced">The dataset object planned in phase 2 returns each layer separately, plus <span class="monoish">clinical_features</span> and <span class="monoish">clinical_mask</span>. That design choice already prepares the repo for fusion later.</p>
+              </div>
+
+              <div class="flow-body" data-stage-copy="2">
+                <h3 class="flow-title">Step 2, image branch</h3>
+                <p>Each retinal layer gets its own encoder. That matters because SVC, DVC, and CC do not look the same biologically or visually.</p>
+                <p data-level="intermediate">After each encoder, the model has one 256-dimensional token per layer. A cross-layer attention block then learns how the layers relate to each other.</p>
+                <p data-level="advanced">This is already one kind of fusion: image-with-image fusion across retinal depth. The plan calls this <span class="monoish">F_octa</span>, the layer-aware OCTA representation.</p>
+              </div>
+
+              <div class="flow-body" data-stage-copy="3">
+                <h3 class="flow-title">Step 3, clinical branch</h3>
+                <p>The clinical branch converts tabular variables into one compact clinical representation.</p>
+                <p data-level="basic">Missing values are not filled with a simple average. The model gets a signal that the value is missing.</p>
+                <p data-level="advanced">The plan uses learnable missing-value mask tokens. That lets the model treat “not measured” as information instead of noise.</p>
+              </div>
+
+              <div class="flow-body" data-stage-copy="4">
+                <h3 class="flow-title">Step 4, fusion</h3>
+                <p>This is the key point. The retinal representation and the clinical representation are merged into one shared state before classification.</p>
+                <p data-level="intermediate">The plan uses cross-attention, where the OCTA representation is conditioned by the clinical representation. In plain language, the model asks how the retinal evidence should be read for this specific patient context.</p>
+                <p data-level="advanced">Because the plan compresses clinical data into a single 256-d token, this cross-attention behaves more like learned conditioning than full token-by-token attention. Conceptually it is still modality-aware fusion.</p>
+              </div>
+
+              <div class="flow-body" data-stage-copy="5">
+                <h3 class="flow-title">Step 5, output</h3>
+                <p>The fused representation goes to the classifier head. That head predicts disease cohort probabilities.</p>
+                <p data-level="intermediate">The planned output also includes uncertainty, calibration, and explainability. So the model should say not only <em>what</em> it predicts, but also how certain it is and what evidence drove the prediction.</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="status">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Current repo status</span>
+            <h2 class="section-title">What is already built, and what is still architecture intent</h2>
+            <p class="section-copy">
+              This distinction matters. The notebook already prepares the project for fusion, but the fusion module itself is not yet implemented in <span class="monoish">main.ipynb</span>.
+            </p>
+          </div>
+          <aside class="section-aside">
+            According to <span class="monoish">PROGRESS.md</span>, current implementation stops at phase 3. Phases 4 to 9, including the fusion branch, remain planned work.
+          </aside>
+        </div>
+
+        <ul class="status-grid">
+          <li>
+            <span class="status-tag built">Built now</span>
+            <strong>Dataset audit and manifest logic</strong>
+            The notebook can scan patient-eye records, check layer availability, examine missingness, and prepare leakage-safe patient splits.
+          </li>
+          <li>
+            <span class="status-tag built">Built now</span>
+            <strong>Clinical preprocessing</strong>
+            Clinical values are normalized fold-by-fold, encoded by type, and paired with missingness masks instead of simple mean imputation.
+          </li>
+          <li>
+            <span class="status-tag built">Built now</span>
+            <strong>Image preprocessing and dataset object</strong>
+            The notebook already returns the sample structure that later fusion needs: separate layer tensors, clinical features, masks, patient id, eye, and fold.
+          </li>
+          <li>
+            <span class="status-tag built">Built now</span>
+            <strong>Layer-specific SimCLR pretraining</strong>
+            The project already pretrains layer-specific image backbones, which later feed the multimodal model.
+          </li>
+          <li>
+            <span class="status-tag planned">Planned next</span>
+            <strong>Per-layer ConvNeXt encoders and cross-layer attention</strong>
+            This stage converts each layer into a 256-d token, then fuses the three retinal layers into one OCTA representation.
+          </li>
+          <li>
+            <span class="status-tag planned">Planned next</span>
+            <strong>Clinical encoder and multimodal fusion block</strong>
+            This is the main image-plus-clinical fusion stage described on this page.
+          </li>
+          <li>
+            <span class="status-tag planned">Planned next</span>
+            <strong>Classifier, prototype logits, and uncertainty</strong>
+            The fused state will feed the final disease classifier and uncertainty-aware output logic.
+          </li>
+          <li>
+            <span class="status-tag watch">Read carefully</span>
+            <strong>This page explains the target architecture</strong>
+            It is an architecture explainer grounded in <span class="monoish">PLAN.md</span> and current progress, not a claim that the fusion code is already complete.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Fusion choices</span>
+            <h2 class="section-title">Why this project uses intermediate fusion</h2>
+            <p class="section-copy">There are three common ways to combine modalities. This project intentionally picks the middle option.</p>
+          </div>
+          <aside class="section-aside">
+            “Intermediate” means separate learning first, joint reasoning second. For this dataset, that is usually the safest compromise between flexibility, interpretability, and data efficiency.
+          </aside>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Fusion style</th>
+              <th>What it does</th>
+              <th>Why it is weaker or stronger here</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-level="basic">
+              <td><strong>Early fusion</strong></td>
+              <td>Combine raw inputs very early.</td>
+              <td>Hard here because pixels and clinical values are very different data types.</td>
+            </tr>
+            <tr data-level="basic">
+              <td><strong>Late fusion</strong></td>
+              <td>Let each modality predict on its own, then average or vote.</td>
+              <td>Easy to build, but weaker at learning nuanced interactions between modalities.</td>
+            </tr>
+            <tr data-level="basic intermediate advanced">
+              <td><strong>Intermediate fusion</strong></td>
+              <td>Learn modality-specific features first, then combine the learned features.</td>
+              <td>This is the planned choice. It lets the image branch stay image-aware and the clinical branch stay clinically meaningful before they meet.</td>
+            </tr>
+            <tr data-level="advanced">
+              <td><strong>Practical effect</strong></td>
+              <td>The clinical branch does not need to learn edge detectors. The image branch does not need to interpret missing spreadsheet fields directly.</td>
+              <td>Each branch solves the part of the problem it is best suited for, then the fusion block models cross-modal dependence.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="deep-dive">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Deep dive</span>
+            <h2 class="section-title">Architecture overview, from basic to advanced</h2>
+            <p class="section-copy">
+              The same architecture can be understood at several levels. Start with the short explanations. Open the advanced notes when you want the design logic.
+            </p>
+          </div>
+          <aside class="section-aside">
+            The project goal is not only prediction accuracy. It also aims for uncertainty, calibration, and explainability that clinicians can inspect.
+          </aside>
+        </div>
+
+        <div class="deep-grid">
+          <div>
+            <h3>1. Separate encoders for the three retinal layers</h3>
+            <p data-level="basic">Each OCTA layer shows a different depth of retinal vasculature. So each gets its own image encoder.</p>
+            <p data-level="intermediate">The planned backbone is ConvNeXt-Tiny, pretrained on ImageNet, then adapted with OCTA SimCLR. After pooling, each branch produces a 256-d token.</p>
+            <details>
+              <summary>Why not share one encoder across all layers?</summary>
+              <p>The plan argues that the layers reflect different physiological compartments and different textures. Shared weights may force one filter bank to fit all three patterns, which can wash out layer-specific signal.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>2. Cross-layer attention before multimodal fusion</h3>
+            <p data-level="basic">Before mixing in the clinical table, the model first asks how the three retinal layers relate to each other.</p>
+            <p data-level="intermediate">Three layer tokens enter a self-attention block with learnable layer-identity embeddings. The output is pooled into one OCTA summary vector, <span class="monoish">F_octa</span>.</p>
+            <details>
+              <summary>Why layer-identity embeddings matter</summary>
+              <p>Without them, self-attention sees three anonymous tokens. The model would know there are three things, but not reliably know which one is SVC, DVC, or CC.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>3. Clinical encoder with explicit missingness handling</h3>
+            <p data-level="basic">The model does not want a blank cell to quietly become a fake average patient.</p>
+            <p data-level="intermediate">Continuous values are z-scored, binary values are encoded, ordinal values like smoking can be embedded, and missingness is carried forward via masks or learned tokens.</p>
+            <details>
+              <summary>Why that matters clinically</summary>
+              <p>Missing data is often not random. A test that was not measured can itself carry information about workflow, patient profile, or chart completeness.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>4. Multimodal fusion block</h3>
+            <p data-level="basic">This is where image evidence and clinical evidence become one shared judgment.</p>
+            <p data-level="intermediate">The plan uses a cross-attention-style block, then concatenates fused image context with the clinical vector and projects the result into a shared 512-d state, <span class="monoish">H</span>.</p>
+            <details>
+              <summary>Why use attention instead of simple concatenation?</summary>
+              <p>Concatenation always gives each modality the same structural role. Attention lets the model condition image interpretation on patient context more selectively.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>5. Classification, prototypes, and uncertainty</h3>
+            <p data-level="basic">The final layer predicts the disease cohort. The plan also wants the model to know when it is unsure.</p>
+            <p data-level="intermediate">The classifier head is paired with prototype-augmented logits, MC dropout, and temperature scaling so probabilities are more useful clinically.</p>
+            <details>
+              <summary>Why uncertainty matters</summary>
+              <p>Clinical models should not behave like overconfident black boxes. High-uncertainty cases can be flagged for manual review instead of being treated as equally reliable.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>6. Explainability after fusion</h3>
+            <p data-level="basic">The plan wants to show what parts of the retinal images mattered, and what clinical variables mattered.</p>
+            <p data-level="intermediate">Grad-CAM is planned for each image branch, attention analysis for layer dominance, and SHAP for clinical feature attribution.</p>
+            <details>
+              <summary>Why this matters for trust</summary>
+              <p>If the model says “this class is likely because the deep layer pattern mattered and diabetes strongly shifted interpretation,” that is more reviewable than a raw probability alone.</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="callout" data-level="advanced">
+          <strong>Advanced nuance</strong>
+          <p>
+            There are really two fusion moments in the planned architecture. First, fusion across retinal layers creates <span class="monoish">F_octa</span>. Second, fusion across modalities combines <span class="monoish">F_octa</span> with the clinical representation. The project therefore uses both <em>intra-image fusion</em> and <em>multimodal fusion</em>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Why this architecture exists</span>
+            <h2 class="section-title">What we are trying to create, and why this design is sensible</h2>
+            <p class="section-copy">The architecture follows the biology, the data format, and the practical limits of a medium-sized medical dataset.</p>
+          </div>
+          <aside class="section-aside">
+            Put simply: keep the parts separate when they are fundamentally different, then merge them when the model has something meaningful to merge.
+          </aside>
+        </div>
+
+        <div class="deep-grid">
+          <div>
+            <h3>Reason 1, retinal depth matters</h3>
+            <p>SVC, DVC, and CC capture different vascular compartments. Disease may leave a stronger signal in one layer than another, or in the relationship between layers.</p>
+          </div>
+          <div>
+            <h3>Reason 2, context changes interpretation</h3>
+            <p>A retinal pattern in a diabetic patient may mean something different from a visually similar pattern in a patient without diabetes or hypertension.</p>
+          </div>
+          <div>
+            <h3>Reason 3, missingness must be handled honestly</h3>
+            <p>Clinical tables are rarely perfect. The architecture is designed so absent values do not silently become misleading pseudo-measurements.</p>
+          </div>
+          <div>
+            <h3>Reason 4, the dataset is not huge</h3>
+            <p>The plan avoids giant end-to-end multimodal transformers from raw inputs. It uses compact feature spaces and staged training to reduce overfitting risk.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="glossary">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Glossary</span>
+            <h2 class="section-title">Core terms, translated</h2>
+            <p class="section-copy">If you know only basic AI/ML, these are the terms that matter most on this page.</p>
+          </div>
+          <aside class="section-aside">
+            The most important mental model: an encoder turns raw data into a compact summary that later parts of the model can reason over more easily.
+          </aside>
+        </div>
+
+        <div class="glossary">
+          <dl>
+            <dt>Feature</dt>
+            <dd>A learned numerical pattern the model thinks is useful, such as vessel density texture or a compact summary of age and risk factors.</dd>
+          </dl>
+          <dl>
+            <dt>Encoder</dt>
+            <dd>The part of the model that reads an input and converts it into a feature vector.</dd>
+          </dl>
+          <dl>
+            <dt>Token</dt>
+            <dd>A vector treated as one item in attention. In this project, each retinal layer becomes one token after projection.</dd>
+          </dl>
+          <dl>
+            <dt>Attention</dt>
+            <dd>A mechanism that learns which other tokens matter when interpreting one token.</dd>
+          </dl>
+          <dl>
+            <dt>Cross-attention</dt>
+            <dd>Attention where one modality is conditioned by another modality. Here, retinal evidence is conditioned by clinical context.</dd>
+          </dl>
+          <dl>
+            <dt>Fusion</dt>
+            <dd>The step where separate sources of evidence are merged into one shared representation used for prediction.</dd>
+          </dl>
+          <dl>
+            <dt>Representation</dt>
+            <dd>The internal numerical summary the model carries forward after encoding.</dd>
+          </dl>
+          <dl>
+            <dt>Calibration</dt>
+            <dd>How well predicted probabilities match real-world correctness. A calibrated 80% confidence score should be right about 80% of the time.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-top">
+          <div>
+            <span class="label">Final takeaway</span>
+            <h2 class="section-title">The architecture story in one paragraph</h2>
+            <p class="section-copy">
+              We are building a multimodal OCTA classifier that first learns each retinal layer on its own, then learns how the layers relate, then uses clinical context to refine that retinal interpretation, and finally produces a disease prediction with uncertainty and explainability. The key idea is that retinal images and clinical variables should stay separate long enough to be understood well, then join before the final decision so the model can reason with both at once.
+            </p>
+          </div>
+          <aside class="section-aside">
+            Repo truth today: the groundwork is implemented, especially the data pipeline and OCTA pretraining. The actual fusion block is the next major architecture step.
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">
+      Self-contained file built from project context in <span class="monoish">PLAN.md</span>, <span class="monoish">PROGRESS.md</span>, <span class="monoish">PRODUCT.md</span>, and <span class="monoish">DESIGN.md</span>.<br />
+      Suggested path: <span class="monoish">outputs/fusion-explainer.html</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const modeButtons = Array.from(document.querySelectorAll('[data-view-target]'));
+      modeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.getAttribute('data-view-target');
+          document.body.setAttribute('data-view', target);
+          modeButtons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn === button)));
+        });
+      });
+
+      const stageButtons = Array.from(document.querySelectorAll('.stage-tabs button'));
+      const copies = Array.from(document.querySelectorAll('[data-stage-copy]'));
+      const svgGroups = Array.from(document.querySelectorAll('.svg-stage'));
+
+      function activateStage(stage) {
+        stageButtons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn.getAttribute('data-stage') === stage)));
+        copies.forEach((copy) => copy.classList.toggle('is-active', copy.getAttribute('data-stage-copy') === stage));
+        svgGroups.forEach((group) => {
+          const isActive = group.getAttribute('data-node') === stage;
+          group.style.opacity = isActive ? '1' : '0.28';
+        });
+      }
+
+      stageButtons.forEach((button) => {
+        button.addEventListener('click', () => activateStage(button.getAttribute('data-stage')));
+      });
+
+      activateStage('1');
+    }());
+  </script>
+</body>
+</html>

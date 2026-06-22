@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Z-scores in Retina CAD</title>
+  <style>
+    :root {
+      --bg: #030303;
+      --surface: #101010;
+      --surface-2: #171717;
+      --line: rgba(255,255,255,0.09);
+      --text: #f5f7fa;
+      --mid: #a4acb8;
+      --low: #747c88;
+      --halo: #7fb2ff;
+      --green: #7dd9a7;
+      --amber: #ffcc7f;
+      --max: 1180px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(127,178,255,0.11), transparent 34rem),
+        linear-gradient(180deg, #070707, #030303 36%, #080808);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.72;
+    }
+    .shell { width: min(calc(100% - 40px), var(--max)); margin: 0 auto; }
+    header { padding: clamp(60px, 9vw, 112px) 0 44px; }
+    .signal { color: var(--mid); display: inline-flex; gap: 10px; align-items: center; margin-bottom: 22px; }
+    .signal::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--halo); box-shadow: 0 0 20px rgba(127,178,255,0.45); }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 { margin: 0; max-width: 11ch; font-size: clamp(3.1rem, 7vw, 5.7rem); line-height: 0.96; letter-spacing: -0.035em; font-weight: 540; }
+    .lead { max-width: 72ch; margin: 26px 0 0; color: var(--mid); font-size: clamp(1.04rem, 1.5vw, 1.17rem); text-wrap: pretty; }
+    section { padding: clamp(54px, 7vw, 92px) 0; border-top: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: minmax(0, 0.72fr) minmax(280px, 1fr); gap: clamp(26px, 5vw, 70px); align-items: start; margin-bottom: 34px; }
+    h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; font-weight: 530; }
+    .section-head p { margin: 0; color: var(--mid); max-width: 72ch; }
+    .formula { margin-top: 28px; padding: 22px 0 0; border-top: 1px solid rgba(127,178,255,0.22); font-size: clamp(1.35rem, 3vw, 2.2rem); letter-spacing: -0.025em; white-space: nowrap; overflow-x: auto; }
+    .definition-stack { border-top: 1px solid var(--line); }
+    .definition { display: grid; grid-template-columns: minmax(170px, 0.34fr) minmax(0, 1fr); gap: clamp(18px, 4vw, 54px); padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .definition h3 { margin: 0; font-size: 1.08rem; line-height: 1.25; }
+    .definition p { margin: 0; color: var(--mid); max-width: 80ch; }
+    .definition p + p { margin-top: 12px; }
+    .number-line { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: rgba(255,255,255,0.025); }
+    .number { padding: 22px 18px; border-right: 1px solid var(--line); min-height: 150px; }
+    .number:last-child { border-right: 0; }
+    .number strong { display: block; font-size: 1.6rem; line-height: 1; margin-bottom: 12px; color: var(--text); }
+    .number span { color: var(--mid); font-size: 0.95rem; }
+    .number.mean { background: rgba(127,178,255,0.08); }
+    .number.good { background: rgba(125,217,167,0.06); }
+    table { width: 100%; border-collapse: collapse; color: var(--mid); }
+    th, td { padding: 16px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th, td:first-child { color: var(--text); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #dbe9ff; }
+    .callout { padding-top: 24px; border-top: 1px solid rgba(127,178,255,0.22); color: var(--mid); max-width: 82ch; }
+    .callout strong { color: var(--halo); }
+    @media (max-width: 900px) { .section-head, .definition { grid-template-columns: 1fr; } .number-line { grid-template-columns: 1fr; } .number { border-right: 0; border-bottom: 1px solid var(--line); min-height: auto; } .number:last-child { border-bottom: 0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <div class="signal">Preprocessing explainer</div>
+      <h1>Z-scores, slowly.</h1>
+      <p class="lead">A z-score is a way to rewrite a raw value as “how unusual is this value compared with the training group?” It changes units like years, BMI points, or pixel intensities into one common scale.</p>
+      <div class="formula"><code>z = (x − mean) / standard deviation</code></div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>The plain meaning.</h2>
+          <p>If the z-score is 0, the value is exactly average. If it is +1, it is one standard deviation above average. If it is −1, it is one standard deviation below average.</p>
+        </div>
+        <div class="number-line" aria-label="z-score scale">
+          <div class="number"><strong>−2</strong><span>Far below average. Uncommon low value.</span></div>
+          <div class="number good"><strong>−1</strong><span>Below average by one typical spread.</span></div>
+          <div class="number mean"><strong>0</strong><span>Exactly the training-set average.</span></div>
+          <div class="number good"><strong>+1</strong><span>Above average by one typical spread.</span></div>
+          <div class="number"><strong>+2</strong><span>Far above average. Uncommon high value.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Concrete example.</h2>
+          <p>Suppose the training patients have mean age 60 and standard deviation 10. A patient aged 70 has z-score +1. A patient aged 45 has z-score −1.5.</p>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Raw value</th><th>Calculation</th><th>Z-score</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Age 60</td><td><code>(60 − 60) / 10</code></td><td><code>0</code></td><td>Average age in the training fold.</td></tr>
+            <tr><td>Age 70</td><td><code>(70 − 60) / 10</code></td><td><code>+1</code></td><td>One standard deviation older than average.</td></tr>
+            <tr><td>Age 45</td><td><code>(45 − 60) / 10</code></td><td><code>−1.5</code></td><td>One and a half standard deviations younger than average.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Why not just use raw numbers?</h2>
+          <p>Because raw variables live on different scales. Age might range from 30 to 90. BMI might range from 18 to 45. Pixel values might have another range. Neural networks train better when inputs arrive on comparable scales.</p>
+        </div>
+        <div class="definition-stack">
+          <article class="definition">
+            <h3>Before z-scoring</h3>
+            <p>Large-scale variables can dominate small-scale variables just because their numbers are bigger, not because they are more clinically important.</p>
+          </article>
+          <article class="definition">
+            <h3>After z-scoring</h3>
+            <p>Every continuous variable is expressed in “distance from normal for this dataset.” The model sees age, BMI, and intensities in a comparable numeric language.</p>
+          </article>
+          <article class="definition">
+            <h3>Negative values are normal</h3>
+            <p>A negative z-score does not mean impossible or bad. It only means below the training-set average. This is why the plan uses GELU instead of ReLU for clinical features, ReLU would erase many negative values.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Critical rule: training stats only.</h2>
+          <p>For each fold, compute the mean and standard deviation on the training patients only. Then reuse those exact numbers for validation and test patients.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Why:</strong> if validation or test data help compute the mean or standard deviation, information leaks from evaluation into training. That makes results look better than they really are.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>In this project.</h2>
+          <p>Z-scores are used for continuous clinical features and for OCTA intensity standardization.</p>
+        </div>
+        <table>
+          <thead><tr><th>Where</th><th>What gets z-scored</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Clinical metadata</td><td>Age, BMI, and other continuous features.</td><td>Make patient variables comparable and stable for the clinical MLP.</td></tr>
+            <tr><td>OCTA images</td><td>Per-channel image intensities after preprocessing.</td><td>Keep image brightness and contrast scale consistent across samples.</td></tr>
+            <tr><td>Not binary features</td><td>Sex, hypertension, diabetes, dyslipidemia, smoking flags.</td><td>Binary 0 or 1 values already have a clear scale and meaning.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

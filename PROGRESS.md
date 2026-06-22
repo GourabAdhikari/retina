@@ -59,3 +59,7 @@
 - Added Phase 3 pair-summary/audit outputs and a backbone registry for later Phase 4 loading.
 - Gated expensive CUDA pretraining behind `RUN_PHASE3_PRETRAINING = False`; set it to `True` on the CUDA-enabled GPU machine to launch training.
 - Added `PHASE3_REQUIRE_CUDA = True` so Phase 3 fails fast if accidentally launched in a non-CUDA runtime.
+- Added live Phase 3 progress reporting in `main.ipynb`:
+  - notebook progress bars for layer-stat computation, total fold/layer launch progress, epochs, and per-epoch batches,
+  - visible per-epoch duration and cumulative training time in both the progress bar postfix and printed epoch logs,
+  - total Phase 3 elapsed time plus average/ETA estimates across fold/layer runs.

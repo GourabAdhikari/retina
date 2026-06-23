@@ -85,6 +85,14 @@
 
 ## 2026-06-23
 
+### Phase 3 logging update
+- Changed `main.ipynb` Phase 3 console logging to restore live visibility without tqdm.
+- Phase 3 now prints:
+  - run start/resume summary with remaining epochs and ETA if prior epoch timings exist,
+  - `START epoch ...` before every epoch,
+  - `END epoch ...` after every epoch with loss, LR, epoch time, average epoch time, elapsed time for the current resumed run, estimated remaining time, and estimated total layer-run time.
+- Set `PHASE3_LOG_EVERY_N_EPOCHS = 1` so end-of-epoch logs print every epoch by default.
+
 ### Planning update
 - Updated `PLAN.md` to replace optional human-provided masks with self-generated OCTA pseudo-masks.
 - Added classical vessel/FAZ/CC flow-deficit pseudo-mask generation, optional frozen segmentation-student refinement, mask QC, biomarker extraction, and classifier mask/biomarker fusion.

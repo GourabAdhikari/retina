@@ -67,7 +67,7 @@
     <div class="shell">
       <div class="signal">Preprocessing explainer</div>
       <h1>Z-scores, slowly.</h1>
-      <p class="lead">A z-score is a way to rewrite a raw value as “how unusual is this value compared with the training group?” It changes units like years, BMI points, or pixel intensities into one common scale.</p>
+      <p class="lead">A z-score is a way to rewrite a raw value as “how unusual is this value compared with the training group?” It changes units like years, BMI points, pixel intensities, vessel density, FAZ area, or flow-deficit burden into one common scale.</p>
       <div class="formula"><code>z = (x − mean) / standard deviation</code></div>
     </div>
   </header>
@@ -147,14 +147,15 @@
       <div class="shell">
         <div class="section-head">
           <h2>In this project.</h2>
-          <p>Z-scores are used for continuous clinical features and for OCTA intensity standardization.</p>
+          <p>Z-scores are used for continuous clinical features, generated OCTA biomarkers, and OCTA intensity standardization.</p>
         </div>
         <table>
           <thead><tr><th>Where</th><th>What gets z-scored</th><th>Why</th></tr></thead>
           <tbody>
-            <tr><td>Clinical metadata</td><td>Age, BMI, and other continuous features.</td><td>Make patient variables comparable and stable for the clinical MLP.</td></tr>
+            <tr><td>Clinical metadata</td><td>Age, BMI, and other continuous features.</td><td>Make patient variables comparable and stable for the tabular MLP.</td></tr>
+            <tr><td>Generated OCTA biomarkers</td><td>Vessel density, FAZ area/perimeter/circularity, CC flow-deficit percentage/count/area.</td><td>Put mask-derived measurements on comparable scale before appending them to clinical features.</td></tr>
             <tr><td>OCTA images</td><td>Per-channel image intensities after preprocessing.</td><td>Keep image brightness and contrast scale consistent across samples.</td></tr>
-            <tr><td>Not binary features</td><td>Sex, hypertension, diabetes, dyslipidemia, smoking flags.</td><td>Binary 0 or 1 values already have a clear scale and meaning.</td></tr>
+            <tr><td>Not binary features</td><td>Sex, hypertension, diabetes, dyslipidemia, smoking flags, clinical masks, biomarker QC flags.</td><td>Binary 0 or 1 values already have a clear scale and meaning.</td></tr>
           </tbody>
         </table>
       </div>

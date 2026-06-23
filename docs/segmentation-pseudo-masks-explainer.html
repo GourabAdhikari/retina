@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self-generated OCTA masks</title>
+  <style>
+    :root {
+      --bg: #030403;
+      --surface: #0d1110;
+      --surface-2: #141a18;
+      --line: rgba(220, 255, 238, 0.10);
+      --text: #f4fbf7;
+      --mid: #a7b8b0;
+      --low: #6f7d77;
+      --green: #7dd9a7;
+      --cyan: #7fd8ff;
+      --amber: #ffcc7f;
+      --rose: #ff9ab0;
+      --max: 1180px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 76% 8%, rgba(127, 216, 255, 0.14), transparent 31rem),
+        radial-gradient(circle at 5% 30%, rgba(125, 217, 167, 0.11), transparent 28rem),
+        linear-gradient(180deg, #07100d 0%, #030403 34%, #090d0b 100%);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.72;
+    }
+    .shell { width: min(calc(100% - 40px), var(--max)); margin: 0 auto; }
+    header { padding: clamp(64px, 9vw, 120px) 0 50px; }
+    .eyebrow { display: inline-flex; gap: 10px; align-items: center; color: var(--mid); margin-bottom: 24px; }
+    .eyebrow::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 24px rgba(125,217,167,.5); }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 { margin: 0; max-width: 12ch; font-size: clamp(3.2rem, 7vw, 5.9rem); line-height: .95; letter-spacing: -.04em; font-weight: 560; }
+    .lead { max-width: 78ch; margin: 26px 0 0; color: var(--mid); font-size: clamp(1.04rem, 1.5vw, 1.18rem); }
+    section { padding: clamp(54px, 7vw, 92px) 0; border-top: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: minmax(0,.68fr) minmax(280px,1fr); gap: clamp(24px,5vw,70px); margin-bottom: 34px; }
+    h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1; letter-spacing: -.03em; font-weight: 540; }
+    .section-head p, p { color: var(--mid); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    .card, .callout, .flow { background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+    .card h3 { margin: 0 0 10px; font-size: 1.08rem; }
+    .card p { margin: 0; }
+    .tag { display: inline-flex; padding: 5px 10px; border-radius: 99px; background: rgba(125,217,167,.10); color: var(--green); font-size: .78rem; margin-bottom: 14px; }
+    .flow { display: grid; gap: 14px; }
+    .step { display: grid; grid-template-columns: 130px 1fr; gap: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.025); }
+    .step strong { color: var(--text); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #dff7ec; }
+    table { width: 100%; border-collapse: collapse; color: var(--mid); }
+    th, td { text-align: left; vertical-align: top; padding: 15px 12px; border-bottom: 1px solid var(--line); }
+    th, td:first-child { color: var(--text); }
+    .warn { border-color: rgba(255,204,127,.28); background: rgba(255,204,127,.06); }
+    .warn strong { color: var(--amber); }
+    @media (max-width: 900px) { .section-head, .grid, .step { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <div class="eyebrow">New plan section: self-generated segmentation</div>
+      <h1>We create the masks ourselves.</h1>
+      <p class="lead">RASTA has no human-drawn vessel, FAZ, or flow-deficit masks. So the project now treats segmentation as weak, automated mask generation: classical image processing first, optional frozen student model second, classifier fusion last.</p>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Core rule.</h2>
+          <p>These are pseudo-masks, not manual ground truth. They can guide the classifier and produce interpretable biomarkers, but papers and docs must not claim human-validated segmentation unless we later annotate a validation subset.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><span class="tag">Sup / Deep</span><h3>Vessel masks</h3><p>CLAHE, vesselness filtering, adaptive thresholding, morphology cleanup, small-component removal.</p></article>
+          <article class="card"><span class="tag">Sup / Deep</span><h3>FAZ masks</h3><p>Find central avascular low-flow component, smooth contour, reject implausible area or off-center masks.</p></article>
+          <article class="card"><span class="tag">CC</span><h3>Flow-deficit masks</h3><p>Local thresholding finds dark hypoperfusion regions, then morphology and area filters remove noise.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Where the student fits.</h2>
+          <p>The student model is upstream of the disease classifier. It is not the classifier. It learns to imitate the classical pseudo-masks and then produces standardized masks for every image.</p>
+        </div>
+        <div class="flow">
+          <div class="step"><strong>1. Preprocess OCTA</strong><span>Normalize, CLAHE, resize, quality-control image.</span></div>
+          <div class="step"><strong>2. Classical pseudo-mask</strong><span>Generate deterministic vessel, FAZ, and CC flow-deficit masks without using disease labels.</span></div>
+          <div class="step"><strong>3. Optional student</strong><span>Train Attention U-Net or U-Net++-style model on pseudo-masks. Freeze it before classifier training.</span></div>
+          <div class="step"><strong>4. Biomarkers</strong><span>Extract density, skeleton density, FAZ geometry, and flow-deficit burden. Normalize with training-fold stats.</span></div>
+          <div class="step"><strong>5. Classifier fusion</strong><span>Use OCTA images + <span class="mono">F_mask</span> + biomarkers + clinical features.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>Attention U-Net or U-Net++?</h2>
+          <p>Both are allowed. The updated plan can keep Attention U-Net as the light default and evaluate U-Net++ when pseudo-masks look stable enough to justify the extra capacity.</p>
+        </div>
+        <table>
+          <thead><tr><th>Choice</th><th>Why use it</th><th>Risk</th></tr></thead>
+          <tbody>
+            <tr><td>Attention U-Net</td><td>Simpler, lighter, easier inside notebook, less likely to overfit noisy pseudo-labels.</td><td>May miss fine capillary detail.</td></tr>
+            <tr><td>U-Net++</td><td>Better multi-scale refinement; attractive for thin OCTA vessels and FAZ boundaries.</td><td>Can learn pseudo-label noise if QC is weak.</td></tr>
+            <tr><td>Default policy</td><td>Start classical-only. Add student only if masks improve by visual/QC review. Freeze student during classifier training.</td><td>Needs montage review and ablation: classical masks vs student masks.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><strong>Do not joint-train by default.</strong><p>Classifier gradients can distort masks. End-to-end segmentation/classification is only an experimental variant after mask-quality monitoring exists.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell">
+        <div class="section-head">
+          <h2>What gets added to the dataset.</h2>
+          <p>The old placeholder mask fields are obsolete. Before classifier work, the notebook should return generated masks, biomarkers, and mask provenance.</p>
+        </div>
+        <table>
+          <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><span class="mono">sup_vessel_mask</span>, <span class="mono">deep_vessel_mask</span></td><td>Generated vessel pseudo-masks.</td></tr>
+            <tr><td><span class="mono">sup_faz_mask</span>, <span class="mono">deep_faz_mask</span></td><td>Generated FAZ pseudo-masks.</td></tr>
+            <tr><td><span class="mono">cc_flow_mask</span></td><td>Generated choriocapillaris flow-deficit pseudo-mask.</td></tr>
+            <tr><td><span class="mono">biomarkers</span></td><td>Mask-derived OCTA measurements appended to tabular branch.</td></tr>
+            <tr><td><span class="mono">mask_source</span></td><td><span class="mono">classical</span> or <span class="mono">student</span>, so experiments are traceable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

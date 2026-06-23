@@ -406,7 +406,7 @@
           </div>
           <div class="rail">
             <h3>What comes later</h3>
-            <p>Once that map is learned, the later supervised classifier uses real labels such as control versus disease or specific clinical cohorts to place decision boundaries on top of the embedding.</p>
+            <p>Once that map is learned, later stages add self-generated OCTA masks/biomarkers and then use real labels such as control versus disease or specific clinical cohorts to place decision boundaries on top of the embedding.</p>
           </div>
         </div>
 
@@ -525,7 +525,7 @@
       <div class="shell">
         <div class="section-head">
           <h2>Training schedule and expected payoff.</h2>
-          <p>Phase 3 is not the final model. It is the preparation stage that gives Phase 4 onward better starting weights. The schedule is intentionally straightforward: long enough to adapt to OCTA, but modular enough that each layer can be audited independently.</p>
+          <p>Phase 3 is not the final model. It is the preparation stage that gives later image encoders better starting weights. The updated plan then adds pseudo-mask generation, optional segmentation-student refinement, multimodal fusion, and classification. The schedule stays modular so each layer and each generated mask family can be audited independently.</p>
         </div>
 
         <div class="viz-block">
@@ -552,11 +552,11 @@
           <div class="step">
             <span class="kicker">Stage C</span>
             <h3>Hand off to downstream phases</h3>
-            <p>Phase 4 and later classification/fusion blocks now start from retinally tuned encoders instead of generic natural-image features.</p>
+            <p>Next stages now start from retinally tuned encoders, then add generated masks/biomarkers before classification/fusion.</p>
           </div>
         </div>
 
-        <p class="bottom-note">In plain language: Phase 3 makes the later CAD model spend less effort learning “what an OCTA image is” and more effort learning “what disease pattern this OCTA image suggests.” That is why this phase exists, and why it is a high-leverage step in the overall pipeline.</p>
+        <p class="bottom-note">In plain language: Phase 3 makes the later CAD model spend less effort learning “what an OCTA image is” and more effort learning “what disease pattern this OCTA image suggests.” The new segmentation-mask work is separate: it generates interpretable vessel/FAZ/flow-deficit evidence after this pretraining stage.</p>
       </div>
     </section>
   </main>

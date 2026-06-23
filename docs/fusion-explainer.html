@@ -634,7 +634,7 @@
         <div class="brandmark" aria-hidden="true"></div>
         <div class="brandcopy">
           <strong>Retina CAD, fusion explainer</strong>
-          <span>How OCTA layers and clinical variables become one prediction pathway</span>
+          <span>How OCTA layers, generated masks, biomarkers, and clinical variables become one prediction pathway</span>
         </div>
       </div>
       <nav class="nav" aria-label="Section navigation">
@@ -654,11 +654,11 @@
           <div class="kicker-row">
             <span class="marker-line"><span class="dot" style="color: var(--halo)"></span>Intermediate fusion, not raw-data fusion</span>
             <span class="marker-line"><span class="dot" style="color: var(--success)"></span>Repo built through phases 1 to 3</span>
-            <span class="marker-line"><span class="dot" style="color: var(--planned)"></span>Fusion branch is planned next</span>
+            <span class="marker-line"><span class="dot" style="color: var(--planned)"></span>Pseudo-mask + fusion branches are planned next</span>
           </div>
-          <h1>Fusion means the model learns from retinal images and clinical context together.</h1>
+          <h1>Fusion means the model learns from images, generated masks, biomarkers, and clinical context together.</h1>
           <p class="lead">
-            In this project, fusion does <em>not</em> mean dumping a spreadsheet next to pixels and hoping for the best. The plan is to first learn a compact representation from each retinal layer, learn a compact representation from the clinical variables, then merge those learned features into one shared pathway that produces class probabilities, uncertainty, and explanations.
+            In this project, fusion does <em>not</em> mean dumping a spreadsheet next to pixels and hoping for the best. The updated plan first learns compact retinal-layer features, generates weak segmentation masks and OCTA biomarkers, encodes clinical variables plus biomarkers as tabular context, then merges those learned features into one shared pathway that produces class probabilities, uncertainty, and explanations.
           </p>
           <div class="mode" aria-label="Reading depth">
             <button type="button" data-view-target="basic" aria-pressed="true">View basics</button>
@@ -668,15 +668,15 @@
           <div class="summary-rail">
             <div>
               <strong>What goes in</strong>
-              <p>Three OCTA layers per eye, plus age, sex, BMI, smoking, hypertension, diabetes, dyslipidemia, and related clinical fields.</p>
+              <p>Three OCTA layers per eye, generated vessel/FAZ/flow-deficit pseudo-masks, OCTA biomarkers, plus age, sex, BMI, smoking, hypertension, diabetes, dyslipidemia, and related clinical fields.</p>
             </div>
             <div>
               <strong>Where fusion happens</strong>
-              <p>After the image and clinical branches each create learned feature vectors. This is feature-level fusion, also called intermediate fusion.</p>
+              <p>After the image, generated-mask, and tabular branches create learned feature vectors. This is feature-level fusion, also called intermediate fusion.</p>
             </div>
             <div>
               <strong>Why it exists</strong>
-              <p>The same retinal pattern can mean different things depending on patient context. Clinical data helps the model interpret what the image pattern likely means.</p>
+              <p>The same retinal pattern can mean different things depending on patient context. Clinical data and generated biomarkers help the model interpret what the image pattern likely means.</p>
             </div>
           </div>
         </div>
@@ -684,11 +684,11 @@
         <aside class="hero-side" aria-labelledby="quick-answer">
           <h2 id="quick-answer">Short answer</h2>
           <p>
-            The planned model has two streams. One stream reads the three OCTA images. The other reads the clinical variables. Those streams meet in a fusion block, then continue as one prediction pathway.
+            The planned model now has three evidence streams. One reads the three OCTA images, one generates/encodes segmentation masks and biomarkers, and one reads clinical variables plus those biomarkers as tabular context. These streams meet in fusion, then continue as one prediction pathway.
           </p>
           <div class="meta-row">
             <span class="marker-line"><span class="dot built"></span>Current notebook: dataset audit, preprocessing, SimCLR pretraining</span>
-            <span class="marker-line"><span class="dot planned"></span>Planned next: image encoders, clinical encoder, fusion, classifier</span>
+            <span class="marker-line"><span class="dot planned"></span>Planned next: pseudo-mask generation, optional segmentation student, encoders, fusion, classifier</span>
             <span class="marker-line"><span class="dot watch"></span>Important: this page separates implemented work from architecture intent</span>
           </div>
         </aside>
@@ -702,17 +702,17 @@
             <span class="label">Overview</span>
             <h2 class="section-title">What “fusion” means in plain language</h2>
             <p class="section-copy" data-level="basic">
-              Imagine a clinician looking at a scan and a chart at the same time. The scan shows what the eye looks like. The chart shows who the patient is and what risk factors they carry. Fusion is the model version of that joint reasoning.
+              Imagine a clinician looking at a scan and a chart at the same time. The scan shows what the eye looks like. The chart shows who the patient is and what risk factors they carry. Fusion is the model version of that joint reasoning, now with an additional mask/biomarker summary of retinal vasculature.
             </p>
             <p class="section-copy" data-level="intermediate">
               In machine learning terms, each input type is first encoded into a numerical summary called a <em>feature vector</em>. Those vectors are then combined into a shared representation that is easier for the classifier to use than raw inputs.
             </p>
             <p class="section-copy" data-level="advanced">
-              This project is aiming for <em>intermediate multimodal fusion</em>. Raw pixels stay in the image branch. Raw tabular values stay in the clinical branch. Fusion happens after modality-specific encoders have transformed them into 256-dimensional learned representations.
+              This project is aiming for <em>intermediate multimodal fusion</em>. Raw pixels stay in the image branch. Generated masks stay in the mask branch. Clinical values and generated biomarkers stay in the tabular branch. Fusion happens after modality-specific encoders have transformed them into compact learned representations.
             </p>
           </div>
           <aside class="section-aside">
-            The model is trying to classify disease cohorts from retinal OCTA. The hypothesis is that disease signal is spread across retinal depth and patient context, not confined to one image or one spreadsheet field.
+            The model is trying to classify disease cohorts from retinal OCTA. The hypothesis is that disease signal is spread across retinal depth, vascular biomarkers, generated masks, and patient context—not confined to one image or one spreadsheet field.
           </aside>
         </div>
 
@@ -722,8 +722,8 @@
             <p>Useful when the scan alone contains enough signal. Weak when the same visual pattern appears in different clinical settings.</p>
           </div>
           <div>
-            <h3>Clinical only</h3>
-            <p>Useful for broad risk estimation. Weak when retinal microvascular texture carries signal that the chart does not capture.</p>
+            <h3>Clinical/tabular only</h3>
+            <p>Useful for broad risk estimation. Now also can include generated biomarkers, but still misses full retinal texture if images are removed.</p>
           </div>
           <div>
             <h3>Fused model</h3>
@@ -733,7 +733,7 @@
 
         <div class="callout" data-level="basic">
           <strong>One sentence summary</strong>
-          <p>Fusion is the step where the model turns “what the eye looks like” and “what we know about the patient” into one joint decision.</p>
+          <p>Fusion is the step where the model turns “what the eye looks like,” “what the generated vascular masks quantify,” and “what we know about the patient” into one joint decision.</p>
         </div>
       </div>
     </section>
@@ -745,11 +745,11 @@
             <span class="label">Architecture view</span>
             <h2 class="section-title">Where fusion sits in the planned pipeline</h2>
             <p class="section-copy">
-              Click the steps below. The diagram highlights one part of the pathway at a time. Solid marks show work already built in the notebook. Dashed marks show the next planned stages from <span class="monoish">PLAN.md</span>.
+              Click the steps below. The diagram highlights one part of the pathway at a time. Solid marks show work already built in the notebook. Dashed marks show the updated planned stages from <span class="monoish">PLAN.md</span>, including self-generated masks.
             </p>
           </div>
           <aside class="section-aside">
-            The current repository has implemented the data path up to preprocessing and layer-specific SimCLR pretraining. The actual fusion block is not coded yet. It is defined in the architecture plan.
+            The current repository has implemented the data path up to preprocessing and layer-specific SimCLR pretraining. The new pseudo-mask generation, segmentation student, and fusion block are not coded yet. They are defined in the architecture plan.
           </aside>
         </div>
 
@@ -757,7 +757,7 @@
           <div class="stage-tabs" role="tablist" aria-label="Pipeline stages">
             <button type="button" role="tab" aria-pressed="true" data-stage="1">1. Inputs</button>
             <button type="button" role="tab" aria-pressed="false" data-stage="2">2. Image branch</button>
-            <button type="button" role="tab" aria-pressed="false" data-stage="3">3. Clinical branch</button>
+            <button type="button" role="tab" aria-pressed="false" data-stage="3">3. Mask + tabular branches</button>
             <button type="button" role="tab" aria-pressed="false" data-stage="4">4. Fusion</button>
             <button type="button" role="tab" aria-pressed="false" data-stage="5">5. Output</button>
           </div>
@@ -766,7 +766,7 @@
             <div>
               <svg viewBox="0 0 1040 620" aria-labelledby="diagram-title diagram-desc" role="img">
                 <title id="diagram-title">Planned Retina CAD fusion pathway</title>
-                <desc id="diagram-desc">Three OCTA image layers flow through separate image encoders, a clinical table flows through a clinical encoder, both join at a fusion block, then continue to classifier and uncertainty outputs.</desc>
+                <desc id="diagram-desc">Three OCTA image layers flow through separate image encoders, generated pseudo-masks flow through a mask encoder and biomarker extractor, clinical plus biomarker values flow through a tabular encoder, then all join at fusion and continue to classifier and uncertainty outputs.</desc>
                 <defs>
                   <linearGradient id="strokeBlue" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stop-color="#7fb2ff" />
@@ -785,7 +785,7 @@
 
                 <g data-node="1" class="svg-stage is-active">
                   <text x="60" y="54" fill="#f5f7fa" font-size="22" font-weight="600">Inputs</text>
-                  <text x="60" y="84" fill="#8c919a" font-size="15">Three retinal layers from OCTA, plus clinical variables from the table.</text>
+                  <text x="60" y="84" fill="#8c919a" font-size="15">Three retinal layers from OCTA, generated weak masks/biomarkers, plus clinical variables from the table.</text>
 
                   <rect x="60" y="120" width="180" height="84" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
                   <path d="M84 170 C100 136, 118 186, 134 152 S166 190, 188 160 S218 176, 228 150" fill="none" stroke="#d7e6ff" stroke-width="2.8" opacity="0.88" />
@@ -803,8 +803,8 @@
                   <text x="84" y="410" fill="#8c919a" font-size="14">choriocapillaris</text>
 
                   <rect x="60" y="478" width="240" height="82" rx="18" fill="#0d0d0d" stroke="rgba(255,255,255,0.10)" />
-                  <text x="84" y="508" fill="#f5f7fa" font-size="17" font-weight="600">Clinical table</text>
-                  <text x="84" y="536" fill="#8c919a" font-size="14">Age, sex, BMI, smoking, hypertension, diabetes, dyslipidemia…</text>
+                  <text x="84" y="508" fill="#f5f7fa" font-size="17" font-weight="600">Clinical table + biomarkers</text>
+                  <text x="84" y="536" fill="#8c919a" font-size="14">Age, risk factors, generated OCTA biomarkers…</text>
                 </g>
 
                 <g data-node="2" class="svg-stage">
@@ -836,17 +836,17 @@
                 </g>
 
                 <g data-node="3" class="svg-stage">
-                  <text x="332" y="506" fill="#f5f7fa" font-size="22" font-weight="600">Clinical branch</text>
-                  <text x="332" y="536" fill="#8c919a" font-size="15">A small MLP turns clinical variables into one 256-d clinical token.</text>
+                  <text x="332" y="506" fill="#f5f7fa" font-size="22" font-weight="600">Mask + tabular branches</text>
+                  <text x="332" y="536" fill="#8c919a" font-size="15">Masks become F_mask; clinical plus biomarkers become F_tabular.</text>
                   <path d="M300 520 H316" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
                   <rect x="316" y="478" width="202" height="82" rx="41" fill="#0f1114" stroke="rgba(127,178,255,0.22)" stroke-dasharray="8 8" />
-                  <text x="362" y="512" fill="#f5f7fa" font-size="17" font-weight="600">Clinical encoder</text>
-                  <text x="356" y="538" fill="#8c919a" font-size="14">handles missingness with masks/tokens</text>
+                  <text x="362" y="512" fill="#f5f7fa" font-size="17" font-weight="600">Tabular encoder</text>
+                  <text x="356" y="538" fill="#8c919a" font-size="14">clinical missingness + biomarker QC flags</text>
                 </g>
 
                 <g data-node="4" class="svg-stage">
                   <text x="744" y="54" fill="#f5f7fa" font-size="22" font-weight="600">Fusion block</text>
-                  <text x="744" y="84" fill="#8c919a" font-size="15">Image representation and clinical representation become one shared state.</text>
+                  <text x="744" y="84" fill="#8c919a" font-size="15">Image, mask, biomarker, and clinical representations become one shared state.</text>
 
                   <path d="M722 272 H780" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
                   <path d="M518 518 C640 518, 640 390, 780 390" fill="none" stroke="#7fb2ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8" />
@@ -855,7 +855,7 @@
                   <rect x="780" y="206" width="170" height="126" rx="24" fill="rgba(127,178,255,0.08)" stroke="url(#strokeBlue)" stroke-width="2.5" filter="url(#softGlow)" />
                   <text x="832" y="246" fill="#f5f7fa" font-size="18" font-weight="600">Fusion</text>
                   <text x="811" y="276" fill="#f5f7fa" font-size="16">cross-attention</text>
-                  <text x="803" y="302" fill="#8c919a" font-size="14">OCTA attends to clinical context</text>
+                  <text x="803" y="302" fill="#8c919a" font-size="14">OCTA attends to tabular context</text>
                 </g>
 
                 <g data-node="5" class="svg-stage">
@@ -885,9 +885,9 @@
             <aside class="flow-panel" aria-live="polite">
               <div class="flow-body is-active" data-stage-copy="1">
                 <h3 class="flow-title">Step 1, inputs</h3>
-                <p>The model sees three OCTA views of the same eye: superficial vascular complex, deep vascular complex, and choriocapillaris. It also sees clinical variables from the spreadsheet.</p>
-                <p data-level="basic">These are different kinds of evidence. Images show structure. Clinical variables show patient context.</p>
-                <p data-level="advanced">The dataset object planned in phase 2 returns each layer separately, plus <span class="monoish">clinical_features</span> and <span class="monoish">clinical_mask</span>. That design choice already prepares the repo for fusion later.</p>
+                <p>The model sees three OCTA views of the same eye: superficial vascular complex, deep vascular complex, and choriocapillaris. It also generates pseudo-masks from those images and sees clinical variables from the spreadsheet.</p>
+                <p data-level="basic">These are different kinds of evidence. Images show structure. Pseudo-masks isolate vessels/FAZ/flow-deficit regions. Clinical variables show patient context.</p>
+                <p data-level="advanced">The updated dataset object should return each layer separately, generated masks, generated biomarkers, <span class="monoish">clinical_features</span>, and <span class="monoish">clinical_mask</span>. Current notebook placeholders must be replaced before classifier work.</p>
               </div>
 
               <div class="flow-body" data-stage-copy="2">
@@ -898,17 +898,17 @@
               </div>
 
               <div class="flow-body" data-stage-copy="3">
-                <h3 class="flow-title">Step 3, clinical branch</h3>
-                <p>The clinical branch converts tabular variables into one compact clinical representation.</p>
-                <p data-level="basic">Missing values are not filled with a simple average. The model gets a signal that the value is missing.</p>
-                <p data-level="advanced">The plan uses learnable missing-value mask tokens. That lets the model treat “not measured” as information instead of noise.</p>
+                <h3 class="flow-title">Step 3, mask + tabular branches</h3>
+                <p>The mask branch uses self-generated vessel, FAZ, and CC flow-deficit pseudo-masks. The tabular branch converts clinical variables plus generated biomarkers into one compact representation.</p>
+                <p data-level="basic">Missing clinical values are not filled with a simple average. Failed biomarker QC is also marked explicitly.</p>
+                <p data-level="advanced">Because RASTA has no manual segmentation labels, masks are weak pseudo-labels from classical image processing, optionally refined by a frozen segmentation student.</p>
               </div>
 
               <div class="flow-body" data-stage-copy="4">
                 <h3 class="flow-title">Step 4, fusion</h3>
-                <p>This is the key point. The retinal representation and the clinical representation are merged into one shared state before classification.</p>
-                <p data-level="intermediate">The plan uses cross-attention, where the OCTA representation is conditioned by the clinical representation. In plain language, the model asks how the retinal evidence should be read for this specific patient context.</p>
-                <p data-level="advanced">Because the plan compresses clinical data into a single 256-d token, this cross-attention behaves more like learned conditioning than full token-by-token attention. Conceptually it is still modality-aware fusion.</p>
+                <p>This is the key point. The retinal representation, mask representation, and tabular representation are merged into one shared state before classification.</p>
+                <p data-level="intermediate">The plan uses cross-attention, where the OCTA representation is conditioned by the tabular representation. In plain language, the model asks how the retinal evidence should be read for this specific patient context and generated biomarker profile.</p>
+                <p data-level="advanced">Because the plan compresses clinical data plus biomarkers into a single 256-d tabular token, this cross-attention behaves more like learned conditioning than full token-by-token attention. The mask feature is fused separately as structured vascular evidence.</p>
               </div>
 
               <div class="flow-body" data-stage-copy="5">
@@ -933,7 +933,7 @@
             </p>
           </div>
           <aside class="section-aside">
-            According to <span class="monoish">PROGRESS.md</span>, current implementation stops at phase 3. Phases 4 to 9, including the fusion branch, remain planned work.
+            According to <span class="monoish">PROGRESS.md</span>, current implementation stops at phase 3. Pseudo-mask generation, the optional segmentation student, and phases 4+ fusion/classification remain planned work.
           </aside>
         </div>
 
@@ -951,7 +951,7 @@
           <li>
             <span class="status-tag built">Built now</span>
             <strong>Image preprocessing and dataset object</strong>
-            The notebook already returns the sample structure that later fusion needs: separate layer tensors, clinical features, masks, patient id, eye, and fold.
+            The notebook currently returns separate layer tensors and placeholder masks. It must be updated to generate/load Sup/Deep vessel masks, Sup/Deep FAZ masks, CC flow masks, biomarkers, patient id, eye, and fold.
           </li>
           <li>
             <span class="status-tag built">Built now</span>
@@ -965,8 +965,13 @@
           </li>
           <li>
             <span class="status-tag planned">Planned next</span>
-            <strong>Clinical encoder and multimodal fusion block</strong>
-            This is the main image-plus-clinical fusion stage described on this page.
+            <strong>Pseudo-mask generation, tabular encoder, and multimodal fusion block</strong>
+            This is the main image-plus-mask-plus-tabular fusion stage described on this page.
+          </li>
+          <li>
+            <span class="status-tag planned">Planned next</span>
+            <strong>Self-generated segmentation masks</strong>
+            Classical pseudo-mask generation will create Sup/Deep vessel masks, Sup/Deep FAZ masks, and CC flow-deficit masks; an optional frozen student can refine them after QC.
           </li>
           <li>
             <span class="status-tag planned">Planned next</span>
@@ -1017,11 +1022,11 @@
             <tr data-level="basic intermediate advanced">
               <td><strong>Intermediate fusion</strong></td>
               <td>Learn modality-specific features first, then combine the learned features.</td>
-              <td>This is the planned choice. It lets the image branch stay image-aware and the clinical branch stay clinically meaningful before they meet.</td>
+              <td>This is the planned choice. It lets the image branch stay image-aware, the mask branch stay vascular-structure-aware, and the tabular branch stay clinically meaningful before they meet.</td>
             </tr>
             <tr data-level="advanced">
               <td><strong>Practical effect</strong></td>
-              <td>The clinical branch does not need to learn edge detectors. The image branch does not need to interpret missing spreadsheet fields directly.</td>
+              <td>The tabular branch does not need to learn edge detectors. The image branch does not need to interpret missing spreadsheet fields directly. The mask branch gives explicit vessel/FAZ/flow-deficit structure.</td>
               <td>Each branch solves the part of the problem it is best suited for, then the fusion block models cross-modal dependence.</td>
             </tr>
           </tbody>
@@ -1066,39 +1071,39 @@
           </div>
 
           <div>
-            <h3>3. Clinical encoder with explicit missingness handling</h3>
-            <p data-level="basic">The model does not want a blank cell to quietly become a fake average patient.</p>
-            <p data-level="intermediate">Continuous values are z-scored, binary values are encoded, ordinal values like smoking can be embedded, and missingness is carried forward via masks or learned tokens.</p>
+            <h3>3. Generated mask and biomarker branch</h3>
+            <p data-level="basic">Because there are no manual masks, the project creates weak vessel, FAZ, and flow-deficit masks itself.</p>
+            <p data-level="intermediate">Classical image processing makes pseudo-masks first. If they are noisy, a frozen Attention U-Net or U-Net++ student can learn to imitate them and produce cleaner standardized masks.</p>
+            <details>
+              <summary>Why generated masks matter</summary>
+              <p>They give the classifier explicit vascular structure and interpretable biomarkers such as vessel density, FAZ area, and CC flow-deficit percentage.</p>
+            </details>
+          </div>
+
+          <div>
+            <h3>4. Tabular encoder with explicit missingness handling</h3>
+            <p data-level="basic">The model does not want a blank cell or failed biomarker to quietly become fake average data.</p>
+            <p data-level="intermediate">Clinical features and generated biomarkers are z-scored fold-wise where continuous, with missingness/QC carried forward via masks or learned tokens.</p>
             <details>
               <summary>Why that matters clinically</summary>
-              <p>Missing data is often not random. A test that was not measured can itself carry information about workflow, patient profile, or chart completeness.</p>
+              <p>Missing data is often not random. A test that was not measured, or a biomarker that failed mask QC, can itself carry information about reliability.</p>
             </details>
           </div>
 
           <div>
-            <h3>4. Multimodal fusion block</h3>
-            <p data-level="basic">This is where image evidence and clinical evidence become one shared judgment.</p>
-            <p data-level="intermediate">The plan uses a cross-attention-style block, then concatenates fused image context with the clinical vector and projects the result into a shared 512-d state, <span class="monoish">H</span>.</p>
+            <h3>5. Multimodal fusion block</h3>
+            <p data-level="basic">This is where image evidence, mask evidence, biomarkers, and clinical evidence become one shared judgment.</p>
+            <p data-level="intermediate">The plan uses cross-attention from <span class="monoish">F_octa</span> to <span class="monoish">F_tabular</span>, then concatenates with <span class="monoish">F_mask</span> and projects the result into a shared 512-d state, <span class="monoish">H</span>.</p>
             <details>
               <summary>Why use attention instead of simple concatenation?</summary>
-              <p>Concatenation always gives each modality the same structural role. Attention lets the model condition image interpretation on patient context more selectively.</p>
+              <p>Concatenation always gives each modality the same structural role. Attention lets the model condition image interpretation on patient context and biomarker profile more selectively.</p>
             </details>
           </div>
 
           <div>
-            <h3>5. Classification, prototypes, and uncertainty</h3>
-            <p data-level="basic">The final layer predicts the disease cohort. The plan also wants the model to know when it is unsure.</p>
-            <p data-level="intermediate">The classifier head is paired with prototype-augmented logits, MC dropout, and temperature scaling so probabilities are more useful clinically.</p>
-            <details>
-              <summary>Why uncertainty matters</summary>
-              <p>Clinical models should not behave like overconfident black boxes. High-uncertainty cases can be flagged for manual review instead of being treated as equally reliable.</p>
-            </details>
-          </div>
-
-          <div>
-            <h3>6. Explainability after fusion</h3>
-            <p data-level="basic">The plan wants to show what parts of the retinal images mattered, and what clinical variables mattered.</p>
-            <p data-level="intermediate">Grad-CAM is planned for each image branch, attention analysis for layer dominance, and SHAP for clinical feature attribution.</p>
+            <h3>6. Classification, prototypes, uncertainty, explainability</h3>
+            <p data-level="basic">The final layer predicts the disease cohort and should show what evidence mattered.</p>
+            <p data-level="intermediate">The classifier head is paired with prototype logits, MC dropout, calibration, Grad-CAM per image branch, attention analysis for layer dominance, SHAP for tabular attribution, and generated-mask overlays.</p>
             <details>
               <summary>Why this matters for trust</summary>
               <p>If the model says “this class is likely because the deep layer pattern mattered and diabetes strongly shifted interpretation,” that is more reviewable than a raw probability alone.</p>
@@ -1109,7 +1114,7 @@
         <div class="callout" data-level="advanced">
           <strong>Advanced nuance</strong>
           <p>
-            There are really two fusion moments in the planned architecture. First, fusion across retinal layers creates <span class="monoish">F_octa</span>. Second, fusion across modalities combines <span class="monoish">F_octa</span> with the clinical representation. The project therefore uses both <em>intra-image fusion</em> and <em>multimodal fusion</em>.
+            There are now three fusion moments in the planned architecture. First, fusion across retinal layers creates <span class="monoish">F_octa</span>. Second, generated masks produce both <span class="monoish">F_mask</span> and biomarkers. Third, multimodal fusion combines <span class="monoish">F_octa</span>, <span class="monoish">F_mask</span>, and <span class="monoish">F_tabular</span>.
           </p>
         </div>
       </div>
@@ -1134,16 +1139,16 @@
             <p>SVC, DVC, and CC capture different vascular compartments. Disease may leave a stronger signal in one layer than another, or in the relationship between layers.</p>
           </div>
           <div>
-            <h3>Reason 2, context changes interpretation</h3>
+            <h3>Reason 2, generated masks make vascular evidence explicit</h3>
+            <p>Vessel density, FAZ geometry, and CC flow-deficit burden are clinically interpretable summaries that complement learned image features.</p>
+          </div>
+          <div>
+            <h3>Reason 3, context changes interpretation</h3>
             <p>A retinal pattern in a diabetic patient may mean something different from a visually similar pattern in a patient without diabetes or hypertension.</p>
           </div>
           <div>
-            <h3>Reason 3, missingness must be handled honestly</h3>
-            <p>Clinical tables are rarely perfect. The architecture is designed so absent values do not silently become misleading pseudo-measurements.</p>
-          </div>
-          <div>
-            <h3>Reason 4, the dataset is not huge</h3>
-            <p>The plan avoids giant end-to-end multimodal transformers from raw inputs. It uses compact feature spaces and staged training to reduce overfitting risk.</p>
+            <h3>Reason 4, missingness and mask QC must be handled honestly</h3>
+            <p>Clinical tables are rarely perfect, and generated masks can fail QC. The architecture is designed so absent values and unreliable biomarkers do not silently become misleading pseudo-measurements.</p>
           </div>
         </div>
       </div>
@@ -1181,15 +1186,27 @@
           </dl>
           <dl>
             <dt>Cross-attention</dt>
-            <dd>Attention where one modality is conditioned by another modality. Here, retinal evidence is conditioned by clinical context.</dd>
+            <dd>Attention where one modality is conditioned by another modality. Here, retinal evidence is conditioned by tabular context: clinical variables plus generated biomarkers.</dd>
           </dl>
           <dl>
             <dt>Fusion</dt>
-            <dd>The step where separate sources of evidence are merged into one shared representation used for prediction.</dd>
+            <dd>The step where separate sources of evidence—images, generated masks, biomarkers, and clinical variables—are merged into one shared representation used for prediction.</dd>
           </dl>
           <dl>
             <dt>Representation</dt>
             <dd>The internal numerical summary the model carries forward after encoding.</dd>
+          </dl>
+          <dl>
+            <dt>Pseudo-mask</dt>
+            <dd>An automatically generated weak segmentation mask. It is useful, but not the same as a human-drawn ground-truth mask.</dd>
+          </dl>
+          <dl>
+            <dt>Segmentation student</dt>
+            <dd>A frozen upstream U-Net-style model trained to imitate classical pseudo-masks and produce standardized masks for the classifier.</dd>
+          </dl>
+          <dl>
+            <dt>Biomarker</dt>
+            <dd>A quantitative OCTA measurement extracted from masks, such as vessel density, FAZ area, or CC flow-deficit percentage.</dd>
           </dl>
           <dl>
             <dt>Calibration</dt>
@@ -1206,11 +1223,11 @@
             <span class="label">Final takeaway</span>
             <h2 class="section-title">The architecture story in one paragraph</h2>
             <p class="section-copy">
-              We are building a multimodal OCTA classifier that first learns each retinal layer on its own, then learns how the layers relate, then uses clinical context to refine that retinal interpretation, and finally produces a disease prediction with uncertainty and explainability. The key idea is that retinal images and clinical variables should stay separate long enough to be understood well, then join before the final decision so the model can reason with both at once.
+              We are building a multimodal OCTA classifier that first learns each retinal layer on its own, generates weak vessel/FAZ/flow-deficit masks and biomarkers, learns how the layers relate, then uses tabular context to refine retinal interpretation, and finally produces a disease prediction with uncertainty and explainability. The key idea is that retinal images, generated masks, biomarkers, and clinical variables should stay separate long enough to be understood well, then join before the final decision.
             </p>
           </div>
           <aside class="section-aside">
-            Repo truth today: the groundwork is implemented, especially the data pipeline and OCTA pretraining. The actual fusion block is the next major architecture step.
+            Repo truth today: the groundwork is implemented through Phase 3. Generated masks, segmentation-student refinement, and the actual fusion/classifier blocks are the next major architecture steps.
           </aside>
         </div>
       </div>

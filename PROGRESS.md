@@ -93,8 +93,15 @@
   - `END epoch ...` after every epoch with loss, LR, epoch time, average epoch time, elapsed time for the current resumed run, estimated remaining time, and estimated total layer-run time.
 - Set `PHASE3_LOG_EVERY_N_EPOCHS = 1` so end-of-epoch logs print every epoch by default.
 
+### Phase 1/2 fast reload
+- Added a standalone fast-reload cell to `main.ipynb` before Phase 3.
+- The cell restores imports, constants, preprocessing helpers, `manifest_clin`, `phase2_manifest`, `phase2_folds`, `clinical_preprocessors`, and `layer_stats_by_fold` from saved Phase 1/2 outputs.
+- It checks required artifact files first and raises a clear message to rerun Phase 1/2 if any are missing.
+
 ### Planning update
 - Updated `PLAN.md` to replace optional human-provided masks with self-generated OCTA pseudo-masks.
 - Added classical vessel/FAZ/CC flow-deficit pseudo-mask generation, optional frozen segmentation-student refinement, mask QC, biomarker extraction, and classifier mask/biomarker fusion.
 - Adjusted losses, ablations, contributions, and deliverables to reflect weak segmentation without manual ground-truth masks.
 - Note: existing Phase 2 notebook placeholder masks now need replacement by generated masks in a later implementation pass.
+- Updated HTML docs under `docs/` to reflect self-generated OCTA pseudo-masks, optional segmentation student, generated biomarkers, tabular fusion, and current notebook status through Phase 3.
+- Added `docs/segmentation-pseudo-masks-explainer.html` as the dedicated explainer for classical masks, optional Attention U-Net/U-Net++ student refinement, mask QC, and dataset fields.

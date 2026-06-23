@@ -69,3 +69,16 @@
   - per-epoch history now records NT-Xent random-baseline loss and delta,
   - layer-run aborts at epoch 10 if loss remains within `0.02` of random baseline, saving a checkpoint first.
 - After preflight showed `inf` gradients and zero parameter update, disabled Phase 3 AMP, lowered LR from `0.1` to `0.03`, added finite-gradient checks, and added gradient clipping at norm `1.0`.
+
+## 2026-06-22
+
+### Phase 3 resumability
+- Made Phase 3 OCTA-SimCLR training resumable in `main.ipynb`.
+- Changed Phase 3 config cell to enable automatic resume from `*_last.pt` and save the last checkpoint every epoch.
+- Changed Phase 3 checkpoint/training-loop cell to:
+  - centralize last/best/backbone checkpoint paths,
+  - load existing `*_last.pt` automatically,
+  - restore model, optimizer, scheduler, history, and RNG state,
+  - continue at the next epoch,
+  - treat already-complete checkpoints as complete and export the backbone without retraining.
+- Changed Phase 3 launch cell to print resume settings before layer runs.

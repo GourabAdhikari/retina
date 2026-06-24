@@ -105,3 +105,19 @@
 - Note: existing Phase 2 notebook placeholder masks now need replacement by generated masks in a later implementation pass.
 - Updated HTML docs under `docs/` to reflect self-generated OCTA pseudo-masks, optional segmentation student, generated biomarkers, tabular fusion, and current notebook status through Phase 3.
 - Added `docs/segmentation-pseudo-masks-explainer.html` as the dedicated explainer for classical masks, optional Attention U-Net/U-Net++ student refinement, mask QC, and dataset fields.
+
+## 2026-06-24
+
+### Phase 4 progress
+- Added **Phase 4 — Image Encoders with Projection Heads** cells to `main.ipynb`.
+- Implemented independent Sup/Deep/CC ConvNeXt-Tiny image encoders with no shared backbone parameters.
+- Implemented per-layer projection heads: `Linear(768,512) -> GELU -> LayerNorm -> Linear(512,256) -> LayerNorm`.
+- Added Phase 3 backbone loading from expected `*_backbone.pt` files, with layer metadata validation.
+- Retained final spatial feature maps before pooling for later Grad-CAM.
+- Added `Phase4OCTAImageEncoders` forward output:
+  - `layer_tokens`: `[B, 3, 256]`
+  - per-layer 256-d tokens
+  - pooled 768-d features
+  - per-layer final spatial feature maps.
+- Added backbone availability audit writing `outputs/phase4_image_encoders/phase4_backbone_availability.csv`.
+- Kept `PHASE4_REQUIRE_SIMCLR_BACKBONES = False` and `PHASE4_RUN_SMOKE_TEST = False` so the notebook does not fail before Phase 3 outputs exist.

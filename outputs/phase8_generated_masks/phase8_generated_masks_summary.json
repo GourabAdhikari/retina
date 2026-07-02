@@ -24,8 +24,8 @@
     "deep_faz_mask",
     "cc_flow_mask"
   ],
-  "mask_source": "classical",
+  "mask_source": "classical_improved",
   "n_samples": 476,
   "note": "Deterministic weak pseudo-masks; not human ground truth.",
-  "qc_pass_rate": 0.7457983193277311
+  "qc_pass_rate": 0.9936974789915967
 }

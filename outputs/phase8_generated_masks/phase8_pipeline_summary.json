@@ -24,12 +24,12 @@
     "deep_faz_mask",
     "cc_flow_mask"
   ],
-  "mask_source": "classical",
-  "mask_source_default": "classical",
+  "mask_source": "classical_improved",
+  "mask_source_default": "classical_improved",
   "n_samples": 476,
   "note": "Deterministic weak pseudo-masks; not human ground truth.",
   "output_dir": "outputs\\phase8_generated_masks",
-  "qc_pass_rate": 0.7457983193277311,
+  "qc_pass_rate": 0.9936974789915967,
   "run_generation_default": true,
   "student_refinement_status": "not trained by default; add only after classical-mask QC review"
 }

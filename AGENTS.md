@@ -9,4 +9,4 @@ Since the dataset is not on this machine, the directory structure will be in [TR
 
 The clinical data is in [Table for publication](table_for_publication.xlsx)
 
-For creating docs/explainers, put them in @docs directory and use [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md)
+For creating docs/explainers, put them in @docs directory and use Impeccable skill, [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md)

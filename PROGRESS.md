@@ -154,3 +154,15 @@
 - Added `phase7_stack_generated_masks` to stack Phase 2/8 mask tensors in canonical order.
 - Added `Phase7MultimodalFusionModel` wrapper that can compose Phase 6 OCTA encoder, Phase 5 tabular encoder, and Phase 7 mask/fusion modules.
 - Added no-image-read smoke test with placeholder generated masks and saved Phase 7 summary artifacts under `outputs/phase7_multimodal_fusion/` when run.
+
+### Phase 8 progress
+- Added **Phase 8 — Self-Generated Segmentation Masks and Biomarkers** cell to `main.ipynb`.
+- Implemented deterministic classical pseudo-mask generation:
+  - Sup/Deep vessel masks via percentile normalization, CLAHE-preprocessed input, Frangi/Sato vesselness, adaptive thresholding, morphology cleanup, and skeletonization.
+  - Sup/Deep FAZ masks via central low-flow/avascular connected-component selection with area and centroid plausibility checks.
+  - CC flow-deficit masks via local background correction, Sauvola/adaptive dark-region detection, and morphology cleanup.
+- Added generated-mask QC for vessel density, FAZ area/centering, and CC flow-deficit fraction.
+- Added Phase 8 biomarker extraction: vessel density, skeleton density, FAZ area/perimeter/circularity/centroid distance, CC flow-deficit fraction/count/mean area/median area.
+- Added artifact generation utilities writing masks, `phase8_generated_masks_biomarkers.csv`, `phase8_mask_qc.csv`, summary JSON, and visual montage sheets.
+- Added `phase8_merge_artifacts`, `RastaPhase8Dataset`, and `make_phase8_datasets_for_fold` so Phase 8 masks/biomarkers can feed Phase 5/7 without changing classifier code.
+- Left `PHASE8_RUN_GENERATION = False` by default because local machine has no dataset; set it to `True` on the data machine after Phase 2/fast reload.

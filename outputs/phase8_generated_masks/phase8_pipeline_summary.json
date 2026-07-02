@@ -1,0 +1,35 @@
+{
+  "biomarker_columns": [
+    "phase8_sup_vessel_density",
+    "phase8_sup_skeleton_density",
+    "phase8_sup_faz_area",
+    "phase8_sup_faz_perimeter",
+    "phase8_sup_faz_circularity",
+    "phase8_sup_faz_centroid_distance",
+    "phase8_deep_vessel_density",
+    "phase8_deep_skeleton_density",
+    "phase8_deep_faz_area",
+    "phase8_deep_faz_perimeter",
+    "phase8_deep_faz_circularity",
+    "phase8_deep_faz_centroid_distance",
+    "phase8_cc_flow_deficit_fraction",
+    "phase8_cc_flow_deficit_count",
+    "phase8_cc_flow_deficit_mean_area",
+    "phase8_cc_flow_deficit_median_area"
+  ],
+  "mask_order": [
+    "sup_vessel_mask",
+    "deep_vessel_mask",
+    "sup_faz_mask",
+    "deep_faz_mask",
+    "cc_flow_mask"
+  ],
+  "mask_source": "classical",
+  "mask_source_default": "classical",
+  "n_samples": 476,
+  "note": "Deterministic weak pseudo-masks; not human ground truth.",
+  "output_dir": "outputs\\phase8_generated_masks",
+  "qc_pass_rate": 0.6743697478991597,
+  "run_generation_default": true,
+  "student_refinement_status": "not trained by default; add only after classical-mask QC review"
+}

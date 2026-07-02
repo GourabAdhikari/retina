@@ -465,23 +465,62 @@ Output:
 cc_flow_mask
 ```
 
-## Step B — Segmentation student model
+## Step B — Classical-mask improvement gate before any student model
 
-If classical masks are noisy or brittle, train a segmentation student to imitate pseudo-labels and produce smoother standardized masks. This model fits **upstream of the disease classifier**, between preprocessing and classification.
+Do **not** train U-Net, Attention U-Net, or U-Net++ directly on poor classical pseudo-labels. A segmentation student can only imitate and regularize its training targets; it cannot recover missing vessels without human ground truth.
 
-Default student architecture:
+Before student refinement is allowed, classical masks must pass a documented review gate:
+
+1. Generate Phase 8 masks and montage sheets.
+2. Visually inspect random samples and all QC failures.
+3. Confirm Sup/Deep vessel masks capture major vessels **and** capillary texture, not only sparse edge/large-vessel fragments.
+4. Confirm FAZ masks are centered and plausible.
+5. Confirm CC flow-deficit masks are not dominated by watermark/edge artifacts.
+6. Tune classical vessel extraction if masks are too sparse:
+   * lower vesselness or adaptive-threshold cutoff,
+   * reduce small-object removal aggressiveness,
+   * combine Frangi/Sato vesselness with adaptive intensity thresholding,
+   * remove watermark/edge artifacts before QC/biomarkers.
+
+Only after this gate is passed may a student be trained.
+
+## Step C — Explicit student-refinement decision gate
+
+A future agent must **not silently skip** student refinement just because it is described as optional. After improved classical masks are generated, make and document one of these explicit decisions in `PROGRESS.md`:
 
 ```text
-Attention U-Net
+Decision A — Use improved classical masks only
+Allowed only if QC + montage review show masks are anatomically acceptable and stable enough.
+Required note: why student refinement is unnecessary.
+
+Decision B — Train U-Net++ student
+Required if improved classical masks are anatomically plausible but still noisy, fragmented, threshold-unstable, or biomarker-unstable.
+Required outputs: student checkpoints, student-vs-classical Dice/IoU, montage comparison, biomarker stability comparison.
+
+Decision C — Do not train student yet; tune classical masks again
+Required if improved classical masks are still anatomically poor/sparse/wrong. U-Net++ must not be trained on bad pseudo-labels.
+```
+
+Default expectation after the improvement pass: **evaluate U-Net++ student refinement unless Decision A is explicitly justified**. In other words, U-Net++ is optional only after a documented QC-based decision, not something to ignore.
+
+## Step D — Segmentation student model
+
+If Decision B is selected, train a segmentation student to imitate pseudo-labels and produce smoother standardized masks. This model fits **upstream of the disease classifier**, between preprocessing and classification.
+
+Student architecture:
+
+```text
+Primary student to evaluate: U-Net++
+Fallback/lighter variant if compute-limited: Attention U-Net
 Encoder: EfficientNet-B0 or ConvNeXt-Nano, 1-channel OCTA input
-Decoder: U-Net decoder with skip connections and attention gates
+Decoder: U-Net++ decoder, or Attention U-Net decoder for fallback
 Output heads:
   Sup/Deep model: 2 channels = vessel + FAZ
   CC model: 1 channel = flow-deficit
 Activation: sigmoid per channel
 ```
 
-Training target: classical pseudo-masks from Step A.
+Training target: QC-passed/improved classical pseudo-masks from Step A/B, not raw failed masks.
 
 Student loss:
 
@@ -509,7 +548,7 @@ Reject or flag generated masks with implausible properties:
 * CC flow-deficit mask nearly all black or all white
 * Excessive tiny connected components
 
-Generate visual montage sheets for random samples and all QC failures. Manually inspect a subset of generated masks and report accept/reject rate if used in a paper.
+Generate visual montage sheets for random samples and all QC failures. A montage is a review contact sheet showing the original Sup/Deep/CC OCTA images beside the generated Sup vessel, Deep vessel, Sup FAZ, Deep FAZ, and CC flow masks for the same eye. Manually inspect a subset of generated masks and report accept/reject rate if used in a paper.
 
 ## Biomarker extraction
 
@@ -545,7 +584,7 @@ Projection: FC(128 → 128) → GELU → LayerNorm
 
 Output: F_mask ∈ ℝ^128
 
-Version 1 default: generate classical masks for all samples. Train/use the frozen segmentation student only if validation QC and visual review show cleaner masks than raw classical masks. The reported full model must state `mask_source` explicitly. Compare performance with and without generated masks, generated biomarkers, and student refinement in ablation (Phase 15).
+Version 1 first rerun: generate **improved classical masks** for all samples. Do not use the current sparse vessel masks as final if visual review shows they miss the capillary network. After improved classical masks, a future agent must explicitly choose Decision A/B/C above. If Decision B is chosen, evaluate **U-Net++ as the primary student** and Attention U-Net only as a lighter fallback. The reported full model must state `mask_source` explicitly (`classical_improved`, `unetpp_student`, or `attention_unet_student`). Compare performance with and without generated masks, generated biomarkers, and student refinement in ablation (Phase 15).
 
 ---
 
@@ -853,7 +892,7 @@ Retrain from scratch with identical seeds for each ablation. Report mean ± std 
 | −Mask branch | Remove F_mask from generated masks |
 | −Mask biomarkers | Remove generated OCTA biomarker vector from tabular encoder |
 | Classical masks only | Use raw image-processing pseudo-masks; bypass segmentation student |
-| Student masks only | Use frozen segmentation-student outputs for masks and biomarkers |
+| Student masks only | Use frozen Attention U-Net / U-Net++ outputs for masks and biomarkers, allowed only after improved classical pseudo-labels pass QC |
 | −Prototype head | Standard linear head only |
 | −Uncertainty (MC-Dropout) | Single deterministic forward pass |
 | −Temperature calibration | Uncalibrated softmax probabilities |

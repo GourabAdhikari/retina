@@ -177,3 +177,4 @@
 - Set default Step C decision to `B_train_unetpp_student` with training disabled by default (`PHASE8_RUN_STUDENT_TRAINING = False`) until refreshed Phase 8 artifacts are available on data/GPU machine.
 - Implemented compact U-Net++ student code in-notebook: QC-passed pseudo-mask dataset, Sup/Deep 2-head vessel+FAZ task, CC flow-deficit task, Tversky+Focal+Dice loss, Dice/IoU metrics, fold training loop, checkpoint/history artifact outputs, and decision summary CSV/JSON.
 - Patched Phase 8C/D U-Net++ fold launch bug: `task` now remains `supdeep`/`cc`; fold-specific names are passed separately via `run_name` (e.g. `fold0_supdeep`).
+- Patched Phase 8C/D missing import: added `import torch.nn.functional as F` for U-Net++ upsampling/loss functions.

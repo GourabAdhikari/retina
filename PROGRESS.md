@@ -124,3 +124,16 @@
 - Added fold/layer-specific Phase 3 backbone loading helpers with metadata validation and graceful fallback when large `.pt` files are absent locally.
 - Added backbone availability audit at `outputs/phase4_image_encoders/phase4_backbone_availability.csv`.
 - Added a clearly marked **SUMMARIZATION CELL — Status through Phase 3 only** before Phase 4, so Phase 1–3 artifact health can be checked without rerunning analysis/preprocessing/pretraining.
+
+### Phase 5 progress
+- Added **Phase 5 — Tabular Metadata Encoder** cells to `main.ipynb`.
+- Implemented fold-aware tabular encoder support:
+  - clinical learned missing-token imputation with one trainable scalar token per feature,
+  - learned scalar embeddings for ordinal clinical fields (e.g. smoking),
+  - optional generated OCTA biomarker stream with fold-fitted z-score stats,
+  - learned biomarker missing tokens for missing/QC-failed biomarker values,
+  - training-time random masking of 10% observed clinical features.
+- Implemented Phase 5 architecture exactly as planned:
+  - `LayerNorm(D_tab)` → `Linear(D_tab→128)` → `GELU` → `Dropout(0.3)` → `Linear(128→256)` → `GELU` → `LayerNorm` → `Dropout(0.2)`.
+- Added utilities to infer Phase 8 biomarker columns when available, save fold-wise biomarker stats, save tabular schema JSON files, and write `outputs/phase5_tabular_encoder/phase5_tabular_encoder_summary.csv`.
+- Added a no-image-read smoke test for output shape `[B, 256]` when Phase 2 artifacts are loaded.

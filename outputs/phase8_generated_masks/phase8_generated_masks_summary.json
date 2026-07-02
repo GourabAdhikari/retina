@@ -27,5 +27,5 @@
   "mask_source": "classical",
   "n_samples": 476,
   "note": "Deterministic weak pseudo-masks; not human ground truth.",
-  "qc_pass_rate": 0.6743697478991597
+  "qc_pass_rate": 0.7457983193277311
 }

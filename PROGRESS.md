@@ -167,3 +167,4 @@
 - Added `phase8_merge_artifacts`, `RastaPhase8Dataset`, and `make_phase8_datasets_for_fold` so Phase 8 masks/biomarkers can feed Phase 5/7 without changing classifier code.
 - Left `PHASE8_RUN_GENERATION = False` by default because local machine has no dataset; set it to `True` on the data machine after Phase 2/fast reload.
 - Patched Phase 8 morphology cleanup for scikit-image 0.26+ deprecation warnings: replaced deprecated binary opening/closing calls and added compatibility wrappers for `remove_small_objects`/`remove_small_holes` threshold parameters.
+- Reviewed newly added Phase 8 outputs: 476 samples, 321/476 QC pass (67.4%). Found montage generation bug (`plt` missing) causing 155 `phase8_error` entries and zero montage files; patched `main.ipynb` to import `matplotlib.pyplot as plt` and prevent montage failures from overriding mask QC.

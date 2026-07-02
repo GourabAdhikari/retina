@@ -146,3 +146,11 @@
 - Added attention extraction and layer-dominance utility for later explainability: per-sample Sup/Deep/CC dominance from attention received across heads/query tokens.
 - Added `Phase6LayerAwareOCTAEncoder` wrapper to compose Phase 4 image encoders with Phase 6 attention.
 - Added smoke test and saved Phase 6 summary/audit artifacts under `outputs/phase6_cross_layer_attention/` when run.
+
+### Phase 7 progress
+- Added **Phase 7 — Multimodal Cross-Attention Fusion** cell to `main.ipynb`.
+- Implemented `Phase7CrossAttentionFusion`: OCTA query attends to tabular/biomarker context with 4-head cross-attention, residual add, LayerNorm, mask concat, and 512-d unified projection.
+- Implemented `Phase7MaskEncoder`: 5 generated pseudo-mask channels (`sup_vessel`, `deep_vessel`, `sup_faz`, `deep_faz`, `cc_flow`) through a lightweight CNN to `F_mask ∈ R^128`.
+- Added `phase7_stack_generated_masks` to stack Phase 2/8 mask tensors in canonical order.
+- Added `Phase7MultimodalFusionModel` wrapper that can compose Phase 6 OCTA encoder, Phase 5 tabular encoder, and Phase 7 mask/fusion modules.
+- Added no-image-read smoke test with placeholder generated masks and saved Phase 7 summary artifacts under `outputs/phase7_multimodal_fusion/` when run.

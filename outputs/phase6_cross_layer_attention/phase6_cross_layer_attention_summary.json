@@ -1,0 +1,15 @@
+{
+  "aggregation": "mean_pool_attended_tokens",
+  "dropout": 0.1,
+  "ffn_dim": 1024,
+  "head_dim": 32,
+  "layers": [
+    "sup",
+    "deep",
+    "cc"
+  ],
+  "num_blocks": 1,
+  "num_heads": 8,
+  "output": "F_octa [B, 256]",
+  "token_dim": 256
+}

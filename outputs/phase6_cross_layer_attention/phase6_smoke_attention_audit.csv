@@ -1,0 +1,2 @@
+has_attention,shape,row_sum_min,row_sum_max,row_sum_mean,attention_min,attention_max
+True,"(4, 8, 3, 3)",0.9999998807907104,1.0000001192092896,1.0,0.05960825830698013,0.7809240221977234

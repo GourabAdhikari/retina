@@ -1,0 +1,122 @@
+[
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_sup_backbone.pt",
+    "best_loss": 1.6930208206176758,
+    "fold": 0,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_sup_history.csv",
+    "layer": "sup",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_deep_backbone.pt",
+    "best_loss": 1.9277088046073914,
+    "fold": 0,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_deep_history.csv",
+    "layer": "deep",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_cc_backbone.pt",
+    "best_loss": 2.927428722381592,
+    "fold": 0,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold0_cc_history.csv",
+    "layer": "cc",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_sup_backbone.pt",
+    "best_loss": 1.7539852857589722,
+    "fold": 1,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_sup_history.csv",
+    "layer": "sup",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_deep_backbone.pt",
+    "best_loss": 1.8120267391204834,
+    "fold": 1,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_deep_history.csv",
+    "layer": "deep",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_cc_backbone.pt",
+    "best_loss": 2.9060678482055664,
+    "fold": 1,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold1_cc_history.csv",
+    "layer": "cc",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_sup_backbone.pt",
+    "best_loss": 1.8002082109451294,
+    "fold": 2,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_sup_history.csv",
+    "layer": "sup",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_deep_backbone.pt",
+    "best_loss": 1.9747419357299805,
+    "fold": 2,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_deep_history.csv",
+    "layer": "deep",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_cc_backbone.pt",
+    "best_loss": 2.694711446762085,
+    "fold": 2,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold2_cc_history.csv",
+    "layer": "cc",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_sup_backbone.pt",
+    "best_loss": 1.542210578918457,
+    "fold": 3,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_sup_history.csv",
+    "layer": "sup",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_deep_backbone.pt",
+    "best_loss": 2.0736905336380005,
+    "fold": 3,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_deep_history.csv",
+    "layer": "deep",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_cc_backbone.pt",
+    "best_loss": 2.780647397041321,
+    "fold": 3,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold3_cc_history.csv",
+    "layer": "cc",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_sup_backbone.pt",
+    "best_loss": 1.6104997992515564,
+    "fold": 4,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_sup_history.csv",
+    "layer": "sup",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_deep_backbone.pt",
+    "best_loss": 2.007561683654785,
+    "fold": 4,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_deep_history.csv",
+    "layer": "deep",
+    "scope": "fold_train"
+  },
+  {
+    "backbone_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_cc_backbone.pt",
+    "best_loss": 2.6576861143112183,
+    "fold": 4,
+    "history_path": "outputs\\phase3_octa_simclr\\simclr_fold_train_fold4_cc_history.csv",
+    "layer": "cc",
+    "scope": "fold_train"
+  }
+]

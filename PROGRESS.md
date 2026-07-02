@@ -106,25 +106,21 @@
 - Updated HTML docs under `docs/` to reflect self-generated OCTA pseudo-masks, optional segmentation student, generated biomarkers, tabular fusion, and current notebook status through Phase 3.
 - Added `docs/segmentation-pseudo-masks-explainer.html` as the dedicated explainer for classical masks, optional Attention U-Net/U-Net++ student refinement, mask QC, and dataset fields.
 
-## 2026-06-24
+## 2026-07-02
+
+### Phase 3 completion audit
+- Confirmed Phase 3 output histories exist for all 15 SimCLR runs: 5 folds × Sup/Deep/CC.
+- Each history has 100 epochs, finite losses, and loss decreased well below the NT-Xent random baseline (~5.541).
+- Best losses: Sup ~1.54–1.80, Deep ~1.81–2.07, CC ~2.66–2.93.
+- Confirmed positive-pair summaries exist for all folds/layers, with bilateral OD/OS positives plus unilateral self-augmented fallback.
+- Confirmed `.pt` checkpoint/backbone files are intentionally absent from this copy because they are too large to move.
+- Noted current local `outputs/phase2_preprocessing/` copy is incomplete for fold 3/4 preprocessor/stat artifacts; rerunning fast reload here would fail unless those artifacts are restored or regenerated.
 
 ### Phase 4 progress
-- Added **Phase 4 — Image Encoders with Projection Heads** cells to `main.ipynb`.
-- Implemented independent Sup/Deep/CC ConvNeXt-Tiny image encoders with no shared backbone parameters.
-- Implemented per-layer projection heads: `Linear(768,512) -> GELU -> LayerNorm -> Linear(512,256) -> LayerNorm`.
-- Added Phase 3 backbone loading from expected `*_backbone.pt` files, with layer metadata validation.
-- Retained final spatial feature maps before pooling for later Grad-CAM.
-- Added `Phase4OCTAImageEncoders` forward output:
-  - `layer_tokens`: `[B, 3, 256]`
-  - per-layer 256-d tokens
-  - pooled 768-d features
-  - per-layer final spatial feature maps.
-- Added backbone availability audit writing `outputs/phase4_image_encoders/phase4_backbone_availability.csv`.
-- Kept `PHASE4_REQUIRE_SIMCLR_BACKBONES = False` and `PHASE4_RUN_SMOKE_TEST = False` so the notebook does not fail before Phase 3 outputs exist.
-
-### Phase 5 progress
-- Added **Phase 5 — Tabular Metadata Encoder** cells to `main.ipynb`.
-- Implemented clinical/tabular input assembly with learned scalar missing tokens, ordinal embeddings via the Phase 2 clinical preprocessor, and training-time random masking of observed clinical features at 10%.
-- Added optional generated-biomarker support for Phase 8 with learned biomarker missing tokens and explicit biomarker QC flag slots.
-- Implemented Phase 5 MLP: `LayerNorm(D_tab) -> Linear(D_tab,128) -> GELU -> Dropout(0.3) -> Linear(128,256) -> GELU -> LayerNorm -> Dropout(0.2)`.
-- Added `build_phase5_tabular_encoder(...)`, parameter counting, fold-wise tabular input audit, and optional smoke test gated by `PHASE5_RUN_SMOKE_TEST = False`.
+- Reimplemented **Phase 4 — Image Encoders with Projection Heads** in `main.ipynb` after intentional removal of old Phase 4/5 cells.
+- Added independent Sup/Deep/CC ConvNeXt-Tiny encoders with no shared backbone parameters.
+- Added Phase 4 projection head: `Linear(768→512) → GELU → LayerNorm → Linear(512→256) → LayerNorm`.
+- Forward output now includes ordered `layer_tokens [B,3,256]`, per-layer tokens, pooled 768-d features, and retained final spatial maps for Grad-CAM.
+- Added fold/layer-specific Phase 3 backbone loading helpers with metadata validation and graceful fallback when large `.pt` files are absent locally.
+- Added backbone availability audit at `outputs/phase4_image_encoders/phase4_backbone_availability.csv`.
+- Added a clearly marked **SUMMARIZATION CELL — Status through Phase 3 only** before Phase 4, so Phase 1–3 artifact health can be checked without rerunning analysis/preprocessing/pretraining.
